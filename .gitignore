@@ -1,0 +1,15 @@
+# build output
+out/
+out-test/
+*.class
+sources.txt
+test-sources.txt
+
+# IDE files (each person sets up their own IDE)
+.idea/
+*.iml
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
