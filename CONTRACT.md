@@ -5,34 +5,42 @@ The exact method name, parameters and return type for every call that crosses fr
 
 Roles: A = Robin (Customers) · B = Ian (Kitchen, Menu & Pricing) · C = Caleb (Game loop, Staff & CLI). See [docs/team-roles.md](docs/team-roles.md).
 
-Fill in the **Signature** column at the kickoff. Class names are suggestions; rename freely.
+**Method names are agreed (12 Oct 2026).** Types marked *(proposed)* were not stated at the meeting; confirm or change them before coding against them.
 
 ## C → A (game loop calls Customer)
-| Need | Class | Signature | Notes |
-|---|---|---|---|
-| Lose satisfaction | `Customer` | | Regular −8 per turn, minimum 0; only while waiting or seated-not-served |
-| Check if left | `Customer` | | True once satisfaction hits 0 |
-| Choose food | `Customer` | | Uses DECISIONS D5 |
-| Get state | `Customer` | | Returns the customer state enum |
-| Record satisfaction at payment | `Customer` | | Value used for the average |
+| Need | Class | Agreed method | Full signature *(proposed types)* | Notes |
+|---|---|---|---|---|
+| Lose satisfaction | `Customer` | `loseSatisfaction()` | `public void loseSatisfaction()` | Called at turn end. The customer applies its own loss (Regular 8, later VIP 5, Critic 12), minimum 0, and only while waiting or seated-not-served. At 0 the customer becomes LEFT. |
+| Check if left | `Customer` | `hasLeft()` | `public boolean hasLeft()` | True once satisfaction hit 0 |
+| Choose food | `Customer` | `chooseFood(menu)` | `public MenuItem chooseFood(Menu menu)` | Uses DECISIONS D5 (seeded random, max 2 Pasta) |
+| Get state | `Customer` | `getState()` | `public CustomerState getState()` | |
+| Record satisfaction at payment | `Customer` | `recordSatisfactionAtPayment()` | `public void recordSatisfactionAtPayment()` | Stores the current satisfaction for the average |
 
 ## C → B (game loop calls kitchen and orders)
-| Need | Class | Signature | Notes |
-|---|---|---|---|
-| Create order | `Order` | | Price locked when the order is taken |
-| Chef works on order | `Chef` | | Advances one preparation unit |
-| Is ready | `Order` | | |
-| Mark served | `Order` | | Only allowed when READY |
-| Get bill | `Order` | | Integer cents |
+| Need | Class | Agreed method | Full signature *(proposed types)* | Notes |
+|---|---|---|---|---|
+| Create order | *to confirm* (e.g. `Order` static factory, or a `Kitchen`) | `createOrder(customer, item, turn)` | `public static Order createOrder(Customer customer, MenuItem item, int turn)` | Price locked when the order is taken |
+| Chef works on order | `Chef` | `chef.work(order)` | `public boolean work(Order order)` | Advances one prep unit. Returns `false` (no change) if the order is READY, SERVED or CANCELLED, so the game can ask again without using up the task |
+| Is ready | `Order` | `isReady()` | `public boolean isReady()` | |
+| Mark served | `Order` | `markServed()` | `public void markServed()` | Only allowed when READY |
+| Get bill | `Order` | `getBill()` | `public int getBill()` | Integer **cents** (e.g. 1800 = $18.00) |
 
 ## B → A (pricing calls Customer)
-| Need | Class | Signature | Notes |
-|---|---|---|---|
-| Get discount for this customer | `Customer` | | Regular 0%, VIP 10% (Stage 2) |
-| *To confirm:* Happy Hour recovery | `Customer` | | +15, capped at 100 (Stage 3). See team-roles "To confirm" |
+| Need | Class | Agreed method | Full signature *(proposed types)* | Notes |
+|---|---|---|---|---|
+| Get discount for this customer | `Customer` | ***not agreed yet*** | e.g. `public int getDiscountPercent()` | Regular 0, VIP 10 (Stage 2). Rounding per D1 |
+| *To confirm:* Happy Hour recovery | `Customer` | ***not agreed yet*** | e.g. `public void recover(int points)` | +15, capped at 100 (Stage 3) |
+
+## Gaps to settle (found while filling this in)
+| Gap | Why it matters | Suggestion |
+|---|---|---|
+| Nothing reads the recorded satisfaction back | C needs it to compute the average satisfaction of paid customers | Add `public int getRecordedSatisfaction()` on `Customer` (C → A) |
+| B → A discount method not named | B can't compute the VIP bill without it | Agree a name before Stage 1 ends (Regular returns 0) |
+| Owner class of `createOrder` | Decides which folder it lives in | `Order` (B's folder) |
 
 ## Shared types
 | Type | Owner | Values / members |
 |---|---|---|
-| Customer state enum | A | |
-| Order status enum | B | |
+| `CustomerState` enum | A | *to fill, e.g.* WAITING, SEATED, ORDERED, EATING, READY_TO_PAY, PAID, LEFT |
+| `OrderStatus` enum | B | *to fill, e.g.* PLACED, PREPARING, READY, SERVED, PAID, CANCELLED |
+| `MenuItem`, `Menu` | B | |
