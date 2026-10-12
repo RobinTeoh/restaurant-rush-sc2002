@@ -2,8 +2,19 @@
 
 SC2002 group assignment: a turn-based restaurant management game in Java (command line).
 
-**Repository:** <!-- https://github.com/<owner>/restaurant-rush -->
-**Team:** <!-- A: name · B: name · C: name -->
+**Repository:** https://github.com/RobinTeoh/restaurant-rush-sc2002
+**Team:** A: Robin (Customers) · B: Ian (Kitchen, Menu & Pricing) · C: Caleb (Game loop, Staff & CLI)
+
+## Team docs
+| File | What it is |
+|---|---|
+| [docs/Team-Manual.pdf](docs/Team-Manual.pdf) | Easy-read manual: roles, timeline, rules, rubric, checklists |
+| [docs/development-plan.md](docs/development-plan.md) | Week-by-week plan we follow |
+| [docs/team-roles.md](docs/team-roles.md) | Who owns which folders, diagrams, report sections and video segments |
+| [DECISIONS.md](DECISIONS.md) | Rules the brief leaves open, and what we chose |
+| [CONTRACT.md](CONTRACT.md) | Agreed method signatures between roles |
+| [docs/test-notes.md](docs/test-notes.md) | Reproducible runs and edge-case checks |
+| [docs/design-log.md](docs/design-log.md) | Design choices, alternatives rejected, and why |
 
 ## Requirements
 - JDK 17 or newer (compiled with `--release 17`)
@@ -25,13 +36,12 @@ SC2002 group assignment: a turn-based restaurant management game in Java (comman
 | 3 | `stage-3` | Host, ComboMeal, Happy Hour |
 
 ### Stage 1 → Stage 2
-<!-- new files; changed or deleted files with reasons; compare link -->
+Compare: https://github.com/RobinTeoh/restaurant-rush-sc2002/compare/stage-1...stage-2
+<!-- new files; changed or deleted files with reasons -->
 
 ### Stage 2 → Stage 3
-<!-- new files; changed or deleted files with reasons; compare link -->
-
-## Design decisions
-See [docs/DECISIONS.md](docs/DECISIONS.md).
+Compare: https://github.com/RobinTeoh/restaurant-rush-sc2002/compare/stage-2...stage-3
+<!-- new files; changed or deleted files with reasons -->
 
 ## Video
 <!-- link + timestamps for segments 1-7 -->

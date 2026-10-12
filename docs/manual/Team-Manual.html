@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Restaurant Rush Team Manual</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm 16mm 15mm; }
+  :root {
+    --ink: #1d2433; --muted: #5b6475; --line: #d9dee7; --soft: #f4f6fa;
+    --a: #2f6fdb; --b: #d9822b; --c: #1f9d6b; --accent: #b4373d;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; color: var(--ink); font-size: 10.2pt; line-height: 1.45; margin: 0; background: #fff; }
+  h1 { font-size: 26pt; margin: 0 0 4mm; letter-spacing: -0.5px; }
+  h2 { font-size: 15pt; margin: 0 0 3mm; padding-bottom: 1.5mm; border-bottom: 2px solid var(--ink); }
+  h3 { font-size: 11.5pt; margin: 5mm 0 2mm; }
+  p { margin: 0 0 2.5mm; }
+  section { page-break-before: always; }
+  section.cover { page-break-before: auto; }
+  table { width: 100%; border-collapse: collapse; margin: 1.5mm 0 4mm; font-size: 9.2pt; page-break-inside: auto; }
+  tr { page-break-inside: avoid; }
+  th, td { border: 1px solid var(--line); padding: 1.6mm 2.2mm; text-align: left; vertical-align: top; }
+  th { background: var(--soft); font-weight: 600; }
+  code { font-family: Menlo, Consolas, monospace; font-size: 8.6pt; background: var(--soft); padding: 0 1mm; border-radius: 2px; }
+  pre { font-family: Menlo, Consolas, monospace; font-size: 8.4pt; background: var(--soft); padding: 2.5mm 3mm; border-radius: 3px; margin: 1.5mm 0 4mm; white-space: pre-wrap; page-break-inside: avoid; }
+  ul { margin: 0 0 3mm; padding-left: 5mm; }
+  li { margin-bottom: 0.8mm; }
+  .muted { color: var(--muted); }
+  .tag { display: inline-block; font-weight: 700; font-size: 8.5pt; padding: 0.3mm 2mm; border-radius: 10px; color: #fff; }
+  .ta { background: var(--a); } .tb { background: var(--b); } .tc { background: var(--c); } .tall { background: var(--ink); }
+  .box { border: 1px solid var(--line); border-left: 4px solid var(--ink); background: var(--soft); padding: 2.5mm 3.5mm; margin: 2mm 0 4mm; page-break-inside: avoid; }
+  .box.warn { border-left-color: var(--accent); }
+  .box.add { border-left-color: var(--b); }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 3mm; margin: 2mm 0 4mm; }
+  .card { border: 1px solid var(--line); border-top: 4px solid var(--ink); padding: 2.5mm 3mm; page-break-inside: avoid; }
+  .card.a { border-top-color: var(--a); } .card.b { border-top-color: var(--b); } .card.c { border-top-color: var(--c); }
+  .card h4 { margin: 0 0 1.5mm; font-size: 10.5pt; }
+  .card ul { font-size: 9pt; }
+  .check li { list-style: none; margin-left: -4mm; }
+  .check li::before { content: "☐  "; }
+  .cover-meta td { border: none; padding: 1mm 4mm 1mm 0; font-size: 10.5pt; }
+  .big { font-size: 12pt; }
+  .flow { font-family: Menlo, Consolas, monospace; font-size: 8.6pt; }
+  .toc li { margin-bottom: 1.2mm; }
+</style>
+</head>
+<body>
+
+<!-- ============ COVER ============ -->
+<section class="cover">
+  <p class="muted big">SC2002 · Group Assignment</p>
+  <h1>Restaurant Rush<br>Team Manual</h1>
+  <p class="big">Everything we agreed, on a few pages: who does what, when, the game rules, and how marks are earned.</p>
+
+  <table class="cover-meta">
+    <tr><td><span class="tag ta">A</span></td><td><b>Robin</b>: Customers</td></tr>
+    <tr><td><span class="tag tb">B</span></td><td><b>Ian</b>: Kitchen, Menu &amp; Pricing (incl. all of Happy Hour)</td></tr>
+    <tr><td><span class="tag tc">C</span></td><td><b>Caleb</b>: Game loop, Staff &amp; CLI</td></tr>
+    <tr><td>Repo</td><td><code>github.com/RobinTeoh/restaurant-rush-sc2002</code></td></tr>
+    <tr><td>Version</td><td>12 Oct 2026, after the first meeting</td></tr>
+  </table>
+
+  <div class="box">
+    <b>Source of truth.</b> This PDF summarises the repo files. If they ever disagree, the repo wins:
+    <code>docs/development-plan.md</code> (the plan), <code>docs/team-roles.md</code> (owners),
+    <code>DECISIONS.md</code> (rules we chose), <code>CONTRACT.md</code> (method signatures).
+    Items marked <span class="tag tb">➕ Addition</span> were added after the meeting to protect rubric marks.
+  </div>
+
+  <h3>Contents</h3>
+  <ol class="toc">
+    <li>The game in one page</li>
+    <li>Team and roles</li>
+    <li>Timeline</li>
+    <li>Week-by-week checklists</li>
+    <li>Our decisions</li>
+    <li>Rules cheat sheet</li>
+    <li>How marks are earned</li>
+    <li>Git routine and tag steps</li>
+    <li>Report, video and submission</li>
+  </ol>
+</section>
+
+<!-- ============ 1. GAME ============ -->
+<section>
+  <h2>1 · The game in one page</h2>
+  <p>A Java command-line, turn-based restaurant game. The player is the <b>manager</b>: staff time is limited, so the manager decides which customers and orders come first. We build it in <b>three runnable stages</b>, each tagged in GitHub.</p>
+
+  <h3>Base setting (must always be offered, so the TA can reproduce runs)</h3>
+  <table>
+    <tr><th>Turns</th><td>18, always all of them (no early ending)</td></tr>
+    <tr><th>Tables</th><td>2</td></tr>
+    <tr><th>Staff</th><td>Waiter ×1 (one task per turn) · Chef ×1 (one prep unit per turn) · Cashier ×1 (one payment per turn, automatic)</td></tr>
+    <tr><th>Arrivals</th><td>One customer at the start of turns <b>1, 4, 7, 10, 13, 16</b> (six in total)</td></tr>
+    <tr><th>Victory</th><td>After turn 18: <b>≥ 4 paid</b> AND <b>revenue ≥ $45</b> AND <b>average satisfaction of paid customers ≥ 60</b>. Otherwise Defeat.</td></tr>
+  </table>
+
+  <table>
+    <tr><th>Menu item</th><th>Price</th><th>Prep units</th></tr>
+    <tr><td>Salad</td><td>$9.00</td><td>1</td></tr>
+    <tr><td>Burger</td><td>$15.00</td><td>1</td></tr>
+    <tr><td>Pasta</td><td>$18.00</td><td>2</td></tr>
+  </table>
+
+  <h3>The three stages</h3>
+  <table>
+    <tr><th>Stage</th><th>Adds</th><th>Tag</th></tr>
+    <tr><td>1 · Basic operation</td><td>Regular customers, menu, Waiter, Chef, Cashier, full turn sequence, victory and defeat</td><td><code>stage-1</code></td></tr>
+    <tr><td>2 · Customer behaviour</td><td>VIPCustomer, CriticCustomer</td><td><code>stage-2</code></td></tr>
+    <tr><td>3 · New role and menu policy</td><td>Host, ComboMeal, Happy Hour</td><td><code>stage-3</code></td></tr>
+  </table>
+
+  <h3>General rules we must never break</h3>
+  <ul>
+    <li><b>Customers choose their own food</b>, never the manager. Show the choice once the order is placed.</li>
+    <li><b>No game rules in the UI.</b> The console only collects choices and displays state; rules live in domain and control classes.</li>
+    <li><b>Money in integer cents</b>, shown as dollars with two decimals.</li>
+    <li><b>Works offline.</b></li>
+    <li><b>Invalid choice:</b> explain why, ask again, and do <b>not</b> use up the staff task.</li>
+    <li><b>Different customer behaviour goes through the customer objects</b>, never a chain of type checks (<code>instanceof</code>) in the controller.</li>
+  </ul>
+</section>
+
+<!-- ============ 2. ROLES ============ -->
+<section>
+  <h2>2 · Team and roles</h2>
+  <p><b>Each person only edits their own folders.</b> If you need a change in someone else's folder, ask them in the group chat or open an issue.</p>
+
+  <div class="grid3">
+    <div class="card a">
+      <h4><span class="tag ta">A</span> Robin · Customers</h4>
+      <ul>
+        <li><b>Folder:</b> <code>customer/</code></li>
+        <li><b>Stage 1:</b> Customer, satisfaction loss and leaving, food choice, discount (Regular 0%)</li>
+        <li><b>Stage 2:</b> VIPCustomer, CriticCustomer, mixed arrival list, Stage 2 runs</li>
+        <li><b>Diagram:</b> class diagram</li>
+        <li><b>Report:</b> trade-offs and alternative design</li>
+        <li><b>Video:</b> 4, 6, 7 (diagrams)</li>
+      </ul>
+    </div>
+    <div class="card b">
+      <h4><span class="tag tb">B</span> Ian · Kitchen, Menu &amp; Pricing</h4>
+      <ul>
+        <li><b>Folders:</b> <code>menu/</code> <code>order/</code> <code>pricing/</code> <code>staff/Chef</code></li>
+        <li><b>Stage 1:</b> MenuItem, Menu, Order, OrderStatus, Chef, bill in cents</li>
+        <li><b>Stage 3:</b> ComboMeal, <b>all</b> of Happy Hour</li>
+        <li><b>Report:</b> SOLID principles</li>
+        <li><b>Video:</b> 3, 5 (combo, Happy Hour)</li>
+      </ul>
+    </div>
+    <div class="card c">
+      <h4><span class="tag tc">C</span> Caleb · Game loop, Staff &amp; CLI</h4>
+      <ul>
+        <li><b>Folders:</b> <code>app/</code> <code>boundary/</code> <code>control/</code> <code>place/</code> <code>staff/Waiter</code> <code>staff/Cashier</code> <code>staff/Host</code></li>
+        <li><b>Stage 1:</b> Table, WaitingQueue, turn loop, Waiter, Cashier, displays, input, victory check</li>
+        <li><b>Stage 3:</b> Host, Happy Hour switch, README transitions</li>
+        <li><b>Diagram:</b> sequence diagram</li>
+        <li><b>Report:</b> player choices; functional evidence</li>
+        <li><b>Video:</b> 1, 2, 5 (Host), 7 (tags)</li>
+      </ul>
+    </div>
+  </div>
+
+  <p><b>Everyone:</b> tests for their own code · reviews the others' PRs · own rows in the key-abstractions table · own reflection · declarations · speaks in the video.</p>
+
+  <h3>Folder map</h3>
+<pre>restaurant-rush-sc2002/
+├── README.md   DECISIONS.md   CONTRACT.md
+├── docs/            development-plan, team-roles, test-notes, design-log, uml/, report/
+└── src/restaurant/
+    ├── app/         Main                                    (C)
+    ├── boundary/    ConsoleUI                               (C)
+    ├── control/     GameController, ArrivalSchedule         (C)
+    ├── staff/       Waiter, Cashier, Host (C) · Chef (B)
+    ├── place/       Table, WaitingQueue                     (C)
+    ├── customer/    Customer + subclasses, CustomerState    (A)
+    ├── menu/        MenuItem, Menu, ComboMeal               (B)
+    ├── order/       Order, OrderStatus                      (B)
+    └── pricing/     money helpers, HappyHour                (B)</pre>
+
+  <h3>Connection points (filled in CONTRACT.md)</h3>
+  <table>
+    <tr><th>From → to</th><th>What is needed</th></tr>
+    <tr><td><span class="tag tc">C</span> → <span class="tag ta">A</span></td><td>lose satisfaction · check if left · choose food · get state · record satisfaction at payment</td></tr>
+    <tr><td><span class="tag tc">C</span> → <span class="tag tb">B</span></td><td>create order · chef works on order · is ready · mark served · get bill</td></tr>
+    <tr><td><span class="tag tb">B</span> → <span class="tag ta">A</span></td><td>get discount for this customer</td></tr>
+  </table>
+
+  <div class="box warn">
+    <b>To confirm (not assigned in the plan):</b>
+    <ul>
+      <li><b>Revenue tally (Ledger):</b> suggest <b>C</b>, alongside the Cashier and the victory check.</li>
+      <li><b>Happy Hour +15 recovery:</b> B owns the rule, but it changes a Customer. Suggest A provides <code>recover(points)</code> (cap 100) and it goes into CONTRACT.md as B → A.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 3. TIMELINE ============ -->
+<section>
+  <h2>3 · Timeline</h2>
+  <p>Four weeks. <b>Keep the order:</b> the tags must happen in sequence. Dates are targets; shift them to the NTULearn deadline if needed.</p>
+  <table>
+    <tr><th>Week</th><th>Target dates</th><th>Goal</th><th>Tag</th></tr>
+    <tr><td>0</td><td>12–13 Oct</td><td>Kickoff meeting, decisions, contract, repo</td><td></td></tr>
+    <tr><td>1</td><td>13–19 Oct</td><td>Build Stage 1 parts, each person alone, against fakes</td><td></td></tr>
+    <tr><td>2 · first half</td><td>20–22 Oct</td><td>Integrate, acceptance test, victory/defeat runs</td><td><code>stage-1</code></td></tr>
+    <tr><td>2 · second half</td><td>23–26 Oct</td><td>A: Stage 2 on <code>main</code>. B and C: Stage 3 on branches only</td><td><code>stage-2</code></td></tr>
+    <tr><td>3</td><td>27 Oct – 2 Nov</td><td>Merge Stage 3, checks, diagrams from the real code</td><td><code>stage-3</code></td></tr>
+    <tr><td>4</td><td>3 – 9 Nov</td><td>Report, video, submission</td><td></td></tr>
+  </table>
+
+  <h3>Git rules (all weeks)</h3>
+  <ul>
+    <li><code>main</code> must always compile.</li>
+    <li>Branches: <code>a/customer-basics</code>, <code>b/chef</code>, <code>c/turn-loop</code> and so on.</li>
+    <li>Merge by pull request. <b>One other member reviews</b> every PR (this is development-process evidence).</li>
+    <li>Commit small and often, with messages that say <i>why</i>.</li>
+    <li><b>No Stage N+1 code on <code>main</code> before the <code>stage-N</code> tag exists.</b></li>
+  </ul>
+
+  <h3>Weekly rhythm</h3>
+  <ul>
+    <li>A short check-in message every couple of days: what I finished, what I'm stuck on.</li>
+    <li><b>If you need to change CONTRACT.md, tell the other two before you push.</b> That file is the only thing keeping our parts independent.</li>
+  </ul>
+</section>
+
+<!-- ============ 4. CHECKLISTS ============ -->
+<section>
+  <h2>4 · Week-by-week checklists</h2>
+
+  <h3>Week 0 · Kickoff (everyone)</h3>
+  <ul class="check">
+    <li>Everyone reads the brief, then go through sections 2–3 together</li>
+    <li>Trace the §3.3 Pasta example on a whiteboard (it becomes the first acceptance test)</li>
+    <li>Draw the customer state machine and the order status machine</li>
+    <li>Decide the open questions in DECISIONS.md <span class="muted">(done 12 Oct, see section 5)</span></li>
+    <li>Agree the connection points and write them in CONTRACT.md with exact names, parameters and return types</li>
+    <li>Pick a seed or arrival list for the base run · <span class="tag tb">➕ Addition</span> check the seed lets 4 payers reach $45</li>
+    <li>Repo set up <span class="muted">(already done by Robin; Caleb owns CI)</span></li>
+  </ul>
+  <p class="muted">Done when: everyone has pushed one commit, and DECISIONS.md and CONTRACT.md are merged.</p>
+
+  <h3>Week 1 · Stage 1 parts, each person alone</h3>
+  <p>Everyone writes <b>fake versions</b> of the other people's classes (in their own test code, not in <code>main</code>) so their part runs alone.</p>
+  <div class="grid3">
+    <div class="card a"><h4><span class="tag ta">A</span> Robin</h4>
+      <ul class="check">
+        <li>Customer: id, satisfaction 100, state, table/order, satisfaction recorded at payment</li>
+        <li>Loses 8 per waiting turn, min 0; leaves at 0</li>
+        <li>Only loses while waiting or seated-not-served</li>
+        <li>Food choice using D5</li>
+        <li>Discount method: 0% for Regular</li>
+        <li>Test: alone 13 turns → 0 → leaves</li>
+      </ul></div>
+    <div class="card b"><h4><span class="tag tb">B</span> Ian</h4>
+      <ul class="check">
+        <li>Menu items: price in cents, prep units</li>
+        <li>Order: items, units done, status (placed → READY → SERVED → PAID, or CANCELLED)</li>
+        <li>Chef advances one unit; READY on the last unit</li>
+        <li>Bill = price with customer's discount; $x.xx display</li>
+        <li>Test: Pasta needs 2 chef turns; bill $18.00</li>
+      </ul></div>
+    <div class="card c"><h4><span class="tag tc">C</span> Caleb</h4>
+      <ul class="check">
+        <li>Table (2) and waiting queue</li>
+        <li>Turn loop: six steps in order, 18 turns</li>
+        <li>Waiter: seat / take order / serve READY / wait</li>
+        <li>Chef choice passed to B's Chef</li>
+        <li>Cashier: one per turn, oldest first (D2), frees table</li>
+        <li>Start-of-turn display; results with N/A</li>
+        <li>Invalid input: explain, ask again, task not used</li>
+        <li>Victory/defeat check</li>
+      </ul></div>
+  </div>
+  <p class="muted">Done when: each part works against fakes and is merged to <code>main</code> through a reviewed PR.</p>
+
+  <h3>Week 2 first half · Integrate and tag Stage 1 (everyone)</h3>
+  <ul class="check">
+    <li>Swap the fakes for the real classes; fix mismatches together</li>
+    <li>Acceptance test: Pasta example gives 92, 84, 76, 76, 76, paid on turn 6</li>
+    <li>Edge cases: no free table · order not READY · typing letters · abandon at 0 (order cancelled, table freed) · turn-16 customer never pays · N/A before first payment</li>
+    <li>One <b>victory</b> run and one <b>defeat</b> run, every input written down, in <code>docs/test-notes.md</code></li>
+    <li>No VIP, Critic, Host, combo or Happy Hour code anywhere</li>
+    <li>Tag <code>stage-1</code>, then clone the tag fresh and run it</li>
+    <li><span class="tag tb">➕ Addition</span> Robin: <code>docs/uml/stage-1.png</code> class-diagram snapshot from the real code</li>
+  </ul>
+</section>
+
+<section>
+  <h2>4 · Week-by-week checklists (continued)</h2>
+
+  <h3>Week 2 second half · Stage 2, and Stage 3 on branches</h3>
+  <div class="grid3">
+    <div class="card a"><h4><span class="tag ta">A</span> Robin · Stage 2 (merges to main)</h4>
+      <ul class="check">
+        <li>VIPCustomer: loses 5, 10% discount</li>
+        <li>CriticCustomer: loses 12 + special behaviour (D7)</li>
+        <li>Arrival list with ≥1 VIP and ≥1 Critic, still 6 arrivals</li>
+        <li>No type checks in the controller: search for <code>instanceof</code></li>
+        <li>Stage 2 victory and defeat runs in test notes</li>
+        <li><span class="tag tb">➕</span> <code>docs/uml/stage-2.png</code></li>
+      </ul></div>
+    <div class="card b"><h4><span class="tag tb">B</span> Ian · Stage 3 on a branch</h4>
+      <ul class="check">
+        <li>ComboMeal: units summed, 90% price rounded to the cent, combo-choice rule (D8)</li>
+        <li>Happy Hour: once per game, 2 turns, 20% off, VIP first, price locked, +15 recovery, duration shown</li>
+        <li>Do <b>not</b> merge before <code>stage-2</code></li>
+      </ul></div>
+    <div class="card c"><h4><span class="tag tc">C</span> Caleb · Stage 3 on a branch</h4>
+      <ul class="check">
+        <li>Host: ≤1 per turn, in addition to the Waiter (D4)</li>
+        <li>Menu option to switch on Happy Hour; call B's hook at turn start</li>
+        <li>README "Stage 1 → 2" with compare link</li>
+        <li>Do <b>not</b> merge before <code>stage-2</code></li>
+      </ul></div>
+  </div>
+  <p>Then: integrate, test, tag <code>stage-2</code>, fresh-clone check.</p>
+
+  <h3>Week 3 · Stage 3 tag and diagrams</h3>
+  <ul class="check">
+    <li>Merge B's and C's Stage 3 branches; integrate; test</li>
+    <li>Salad + Pasta combo = $24.30, 3 units</li>
+    <li>VIP Burger during Happy Hour = $10.80</li>
+    <li>Happy Hour can't be switched on twice; doesn't change old orders</li>
+    <li>Stage 1 and 2 behaviour still works</li>
+    <li>Tag <code>stage-3</code>, fresh-clone check</li>
+    <li>Caleb: README "Stage 2 → 3"</li>
+    <li>Robin: <b>class diagram</b> from the real Stage 3 code (also the stage-3 snapshot)</li>
+    <li>Caleb: <b>sequence diagram</b> for one full scenario</li>
+  </ul>
+  <div class="box add">
+    <b>➕ Note on "Stage 1 and 2 still work":</b> the old input files won't replay unchanged on Stage 3, because Stage 3 adds the Happy Hour prompt.
+    Prove it with the Stage 1/2 tests still passing, and/or copies of the old runs with the extra answers added
+    (e.g. <code>runs/stage3-replay-stage1-victory.txt</code>). Record which in <code>docs/test-notes.md</code>.
+  </div>
+
+  <h3>Week 4 · Report, video, submission</h3>
+  <p>See section 9.</p>
+</section>
+
+<!-- ============ 5. DECISIONS ============ -->
+<section>
+  <h2>5 · Our decisions</h2>
+  <h3>Agreed at the first meeting (12 Oct 2026)</h3>
+  <table>
+    <tr><th>#</th><th>Question</th><th>Decision</th></tr>
+    <tr><td>D1</td><td>Rounding</td><td><b>After each discount</b>, half-up to the cent: <code>(cents × (100 − pct) + 50) / 100</code>.<br>VIP Burger in Happy Hour: 1500 → 1350 → <b>1080 ($10.80)</b>. Salad + Pasta combo: 2700 → <b>$24.30</b>.</td></tr>
+    <tr><td>D2</td><td>Cashier "oldest first"</td><td>Whoever became <b>READY_TO_PAY earliest</b> pays first. <i>Tie → earlier arrival (to confirm).</i></td></tr>
+    <tr><td>D3</td><td>Customer leaves with a READY order</td><td>Order <b>discarded</b>: CANCELLED, no revenue; table freed.</td></tr>
+    <tr><td>D4</td><td>Host (Stage 3)</td><td><b>Automatic, before the Waiter</b>: seats the first queued customer at a free table. The Waiter may still seat someone after.</td></tr>
+    <tr><td>D5</td><td>Food choice</td><td><b>Seeded random</b> from Burger, Salad, Pasta (fixed seed, same every run). <b>Max 2 Pasta per game</b>: a 3rd Pasta pick is re-picked. Choice shown when ordered.</td></tr>
+  </table>
+  <div class="box warn"><b>Check D5 before the Stage 1 tag:</b> a seed giving mostly Salad makes $45 impossible (4 × $9 = $36). Choose the seed (D6) and confirm 4 of the first 5 customers can reach $45.</div>
+
+  <h3>Still open</h3>
+  <table>
+    <tr><th>#</th><th>Question</th><th>Needed by</th><th>Notes</th></tr>
+    <tr><td>D6</td><td>Base-run seed and arrival list</td><td>Stage 1</td><td>Stage 2 list needs ≥1 VIP and ≥1 Critic, still 6 arrivals</td></tr>
+    <tr><td>D7</td><td>Critic's special behaviour</td><td>Stage 2</td><td>Distinct order preference or reaction to service; inside CriticCustomer only</td></tr>
+    <tr><td>D8</td><td>Combo-choice rule</td><td>Stage 3</td><td>Documented; deterministic or seeded</td></tr>
+    <tr><td>D9</td><td>Happy Hour timing</td><td>Stage 3</td><td>Suggest: prompt → +15 recovery → display → steps 1–6</td></tr>
+    <tr><td>D10</td><td>Which queued customer the Waiter seats</td><td>Stage 1</td><td>Manager picks any, or first in queue only</td></tr>
+    <tr><td>D11</td><td>Order inside step 4</td><td>Stage 1</td><td>Suggest: Cashier pays first, then eaters become READY_TO_PAY</td></tr>
+    <tr><td>D12</td><td>End of input</td><td>Stage 1</td><td>Suggest: print "Input ended", finish safely</td></tr>
+    <tr><td>D13</td><td>Customer hierarchy in Stage 1</td><td>Stage 1</td><td>Suggest: abstract Customer + RegularCustomer, so Stage 2 only adds files</td></tr>
+  </table>
+</section>
+
+<!-- ============ 6. RULES ============ -->
+<section>
+  <h2>6 · Rules cheat sheet</h2>
+
+  <h3>Every turn, in this order</h3>
+  <table>
+    <tr><th>Step</th><th>What happens</th></tr>
+    <tr><td>Start</td><td>Show: turn number, revenue, average satisfaction of paid customers, waiting queue, occupied tables, each customer's satisfaction, order status, staff tasks available.</td></tr>
+    <tr><td>1 Arrivals</td><td>Scheduled customer joins the queue with satisfaction 100.</td></tr>
+    <tr><td>2 Manager choices</td><td><b>Waiter</b> (at most one): seat a queued customer · take a seated customer's order · serve a READY order · Wait.<br><b>Chef</b> (at most one): advance one order by one prep unit · Wait. May work on an order taken this turn.</td></tr>
+    <tr><td>3 Kitchen and serving</td><td>Waiter acts <b>before</b> Chef. A dish can be served only if it was READY <b>before</b> the Waiter acts, so a dish finished this turn is served next turn at the earliest.</td></tr>
+    <tr><td>4 Eating and payment</td><td>Served on an earlier turn → READY_TO_PAY. Cashier pays at most one READY_TO_PAY customer, oldest first; one who became READY_TO_PAY this turn pays next turn at the earliest. Payment adds the bill, marks PAID, frees the table.</td></tr>
+    <tr><td>5 Waiting</td><td>Every waiting or seated-not-served customer loses satisfaction (min 0). At 0 they leave: order cancelled, table freed. Served / eating / ready-to-pay lose nothing.</td></tr>
+    <tr><td>6 Result</td><td>After turn 18: Victory if all three targets met, else Defeat.</td></tr>
+    <tr><td>End</td><td>Show served count, unhappy departures, revenue, average (N/A if nobody paid), turns used.</td></tr>
+  </table>
+
+  <h3>State machines</h3>
+<pre class="flow">Customer
+  WAITING ──seat──▶ SEATED ──take order──▶ ORDERED ──serve──▶ EATING
+                                                                 │ next turn
+                                                                 ▼
+                                    PAID ◀──Cashier, later turn── READY_TO_PAY
+  WAITING / SEATED / ORDERED ──satisfaction hits 0 at turn end──▶ LEFT
+                                         (order cancelled, table freed)
+
+Order
+  PLACED ─▶ PREPARING ─▶ READY ─▶ SERVED ─▶ PAID
+  (any state before SERVED) ──customer leaves──▶ CANCELLED</pre>
+
+  <h3>Customer types</h3>
+  <table>
+    <tr><th>Type</th><th>Loss per waiting turn</th><th>Bill</th><th>Special</th></tr>
+    <tr><td>Regular</td><td>8</td><td>Full price</td><td>none</td></tr>
+    <tr><td>VIP (Stage 2)</td><td>5</td><td>10% off</td><td>none</td></tr>
+    <tr><td>Critic (Stage 2)</td><td>12</td><td>Full price</td><td>Our choice (D7)</td></tr>
+  </table>
+
+  <h3>Stage 3 rules</h3>
+  <ul>
+    <li><b>Host:</b> seats at most one queued customer per turn, in addition to the Waiter. The Waiter can still seat.</li>
+    <li><b>ComboMeal:</b> two existing items; prep units = sum; price = 90% of the sum, rounded to the cent.</li>
+    <li><b>Happy Hour:</b> once per game, switched on at turn start, lasts that turn and the next; show remaining duration. Orders <b>taken</b> while active get 20% off. Customers waiting for a table or food recover +15 at turn start (max 100). VIP discount first, then Happy Hour. Price locked at order time; old orders and departed customers unaffected.</li>
+  </ul>
+
+  <h3>Check numbers (write tests for these)</h3>
+  <table>
+    <tr><th>Case</th><th>Expected</th></tr>
+    <tr><td>§3.3 Pasta example: satisfaction at turn end, turns 1–5</td><td>92, 84, 76, 76, 76 · paid on turn 6 · $18.00</td></tr>
+    <tr><td>Payment timing</td><td>Served on t → READY_TO_PAY on t+1 → paid on t+2 at the earliest</td></tr>
+    <tr><td>Turn-16 arrival</td><td>Never pays (so at most 5 can pay). Intended.</td></tr>
+    <tr><td>Regular left alone</td><td>13 turns → 0 → leaves</td></tr>
+    <tr><td>VIP Burger</td><td>$13.50</td></tr>
+    <tr><td>VIP Burger in Happy Hour</td><td>$10.80</td></tr>
+    <tr><td>Regular Pasta in Happy Hour</td><td>$14.40</td></tr>
+    <tr><td>Combos</td><td>Salad + Burger $21.60 / 2 units · Salad + Pasta $24.30 / 3 units · Burger + Pasta $29.70 / 3 units</td></tr>
+  </table>
+</section>
+
+<!-- ============ 7. MARKS ============ -->
+<section>
+  <h2>7 · How marks are earned (100)</h2>
+  <p>No live demo. Marks come from the submitted files, the GitHub repo and the video.</p>
+  <table>
+    <tr><th style="width:24%">Criterion</th><th style="width:7%">Marks</th><th>What an A+ looks like</th><th style="width:10%">Lead</th></tr>
+    <tr><td><b>UML class diagram</b></td><td>25</td><td>Matches the Stage 3 code exactly (same class names). Visibility on every attribute and operation. Enums, abstract classes, inheritance, associations with multiplicities, composition (e.g. ComboMeal ◆ 2 MenuItem). Notes pointing out encapsulation, polymorphism and composition. Readable on one page.</td><td><span class="tag ta">A</span></td></tr>
+    <tr><td><b>UML sequence diagram</b></td><td>20</td><td>One scenario where a <b>manager choice changes the outcome</b> (shown with <code>alt</code>). Lifelines for CLI, controller, staff, domain objects. <code>loop</code> and guards. Arrival → order → Waiter and Chef → READY → SERVED → eating → payment → result check, plus VIP pricing or Happy Hour. Real method names.</td><td><span class="tag tc">C</span></td></tr>
+    <tr><td><b>Design consideration</b></td><td>15</td><td>Responsibilities table. SOLID only with a real class or method as proof. At least two trade-offs and one alternative design. How player choices change the result, with numbers from our runs.</td><td><span class="tag tall">All</span></td></tr>
+    <tr><td><b>Implementation</b></td><td>20</td><td>Every §3 rule correct and tested. No <code>instanceof</code> chains in the controller. No rules in the UI. Input can't crash it. Each tag builds from a fresh clone. Runs reproducible. Private fields, small methods, named constants.</td><td><span class="tag tall">All</span></td></tr>
+    <tr><td><b>Thinking &amp; process</b></td><td>20</td><td>Three tags on runnable commits. Stage snapshots. README transitions (new / changed / deleted files with reasons, compare links). Reviewed PRs. Everyone commits. Honest reflections. ~15-minute video, everyone speaks, timestamps in README.</td><td><span class="tag tall">All</span></td></tr>
+  </table>
+
+  <h3>Quick self-check before every PR</h3>
+  <ul class="check">
+    <li>Builds and all tests pass locally</li>
+    <li>No game rules in ConsoleUI</li>
+    <li>No <code>instanceof</code> or type switch for behaviour</li>
+    <li>Fields private; no public setters for state</li>
+    <li>Money in int cents; rounding in one place</li>
+    <li>No next-stage features merged early</li>
+    <li>DECISIONS.md / CONTRACT.md updated if behaviour or a signature changed</li>
+  </ul>
+</section>
+
+<!-- ============ 8. GIT ============ -->
+<section>
+  <h2>8 · Git routine and tag steps</h2>
+  <h3>Daily routine</h3>
+<pre>git switch main &amp;&amp; git pull                 # start from the latest main
+git switch -c a/customer-basics             # one branch per task: &lt;letter&gt;/&lt;topic&gt;
+# ...work, build, test...
+sh build.sh &amp;&amp; sh test.sh                   # Windows: build.bat, test.bat
+git add &lt;files&gt;
+git commit -m "Add satisfaction floor at 0 so customers can't go negative (§3.2 step 5)"
+git push -u origin a/customer-basics        # then open a PR and request a reviewer
+git switch a/customer-basics &amp;&amp; git merge main   # if main moved while you worked</pre>
+
+  <div class="box warn"><b>Commit credit:</b> run <code>git config --global user.email</code> and make sure it is an email on <b>your GitHub account</b>, or your commits won't count as yours.</div>
+
+  <h3>Tagging a stage (all three present)</h3>
+  <ul class="check">
+    <li>All PRs for this stage merged; <code>main</code> builds and tests pass</li>
+    <li>This stage's victory and defeat runs replay correctly</li>
+    <li>No future-stage code (Stage 1: no VIP, Critic, Host, Combo, HappyHour. Stage 2: no Host, Combo, HappyHour)</li>
+    <li>Snapshot <code>docs/uml/stage-N.png</code> committed</li>
+  </ul>
+<pre>git switch main &amp;&amp; git pull
+git tag -a stage-1 -m "Stage 1: basic restaurant operation"
+git push origin stage-1
+
+# fresh-clone check
+git clone --branch stage-1 https://github.com/RobinTeoh/restaurant-rush-sc2002.git check-stage-1
+cd check-stage-1 &amp;&amp; sh build.sh &amp;&amp; sh test.sh &amp;&amp; sh run.sh &lt; runs/stage1-victory.txt</pre>
+  <p class="muted">Never move a pushed tag. If an old stage has a bug found later, fix it on <code>main</code> and mention it in the README.</p>
+
+  <h3>Build and run</h3>
+  <table>
+    <tr><th></th><th>Windows (cmd)</th><th>macOS / Linux / Git Bash</th></tr>
+    <tr><td>Build</td><td><code>build.bat</code></td><td><code>sh build.sh</code></td></tr>
+    <tr><td>Run</td><td><code>run.bat</code></td><td><code>sh run.sh</code></td></tr>
+    <tr><td>Test</td><td><code>test.bat</code></td><td><code>sh test.sh</code></td></tr>
+    <tr><td>Replay</td><td><code>run.bat &lt; runs\stage1-victory.txt</code></td><td><code>sh run.sh &lt; runs/stage1-victory.txt</code></td></tr>
+  </table>
+</section>
+
+<!-- ============ 9. SUBMISSION ============ -->
+<section>
+  <h2>9 · Report, video and submission</h2>
+  <h3>Report (PDF; each section has an owner)</h3>
+  <table>
+    <tr><th>Section</th><th>Owner</th></tr>
+    <tr><td>Class diagram, with annotations</td><td><span class="tag ta">A</span> Robin</td></tr>
+    <tr><td>Sequence diagram</td><td><span class="tag tc">C</span> Caleb</td></tr>
+    <tr><td>Key abstractions and responsibilities table</td><td>Everyone fills in their own classes</td></tr>
+    <tr><td>SOLID principles (only where the code really shows them)</td><td><span class="tag tb">B</span> Ian</td></tr>
+    <tr><td>Trade-offs and one alternative design</td><td><span class="tag ta">A</span> Robin</td></tr>
+    <tr><td>How the player's choices change a result</td><td><span class="tag tc">C</span> Caleb</td></tr>
+    <tr><td>Functional evidence (screenshots of runs)</td><td><span class="tag tc">C</span> Caleb</td></tr>
+    <tr><td>Reflections</td><td>Each person writes their own</td></tr>
+  </table>
+
+  <h3>Video (~15 minutes, everyone speaks; timestamps in the README)</h3>
+  <table>
+    <tr><th>#</th><th>Segment</th><th>Speaker</th></tr>
+    <tr><td>1</td><td>Game launching from the submitted project</td><td>Caleb</td></tr>
+    <tr><td>2</td><td>Manager choices, including one where staff are constrained</td><td>Caleb</td></tr>
+    <tr><td>3</td><td>A dish going READY → SERVED → payment</td><td>Ian</td></tr>
+    <tr><td>4</td><td>VIP or Critic behaviour</td><td>Robin</td></tr>
+    <tr><td>5</td><td>Stage 3 feature: combo and Happy Hour; Host</td><td>Ian, with Caleb on the Host</td></tr>
+    <tr><td>6</td><td>One victory and one defeat</td><td>Robin</td></tr>
+    <tr><td>7</td><td>Stage tag comparisons and diagrams</td><td>Caleb (tags), Robin (diagrams)</td></tr>
+  </table>
+
+  <h3>Final checklist</h3>
+  <ul class="check">
+    <li>Class diagram matches the Stage 3 code (check every class name)</li>
+    <li>All three tags exist on runnable commits</li>
+    <li>README: repo URL, both stage comparisons, video timestamps</li>
+    <li>Build and run instructions tested on someone else's laptop</li>
+    <li>Declaration of Original Work signed; each member's GAI declaration done</li>
+    <li>Video file, or a link that opens without logging in</li>
+    <li>Zip named like <code>FCS1_Grp1.zip</code> (source, README, PDF report, video, declarations), submitted</li>
+  </ul>
+</section>
+
+</body>
+</html>
