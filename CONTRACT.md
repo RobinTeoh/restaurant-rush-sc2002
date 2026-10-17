@@ -19,11 +19,16 @@ Roles: A = Robin (Customers) · B = Ian (Kitchen, Menu & Pricing) · C = Caleb (
 ## C → B (game loop calls kitchen and orders)
 | Need | Class | Agreed method | Full signature *(proposed types)* | Notes |
 |---|---|---|---|---|
-| Create order | *to confirm* (e.g. `Order` static factory, or a `Kitchen`) | `createOrder(customer, item, turn)` | `public static Order createOrder(Customer customer, MenuItem item, int turn)` | Price locked when the order is taken |
-| Chef works on order | `Chef` | `chef.work(order)` | `public boolean work(Order order)` | Advances one prep unit. Returns `false` (no change) if the order is READY, SERVED or CANCELLED, so the game can ask again without using up the task |
+| Create order | `Order` (static factory) | `createOrder(customer, item, turn)` | `public static Order createOrder(Customer customer, MenuItem item, int turn)` | Price locked when the order is taken. Caleb calls `customer.chooseFood(menu)` first, then passes the dish in |
+| Chef works on order | `Chef` | `chef.work(order)` | `public boolean work(Order order)` | Advances one prep unit. Returns `false` (no change) if the order is READY, SERVED, PAID or CANCELLED, so the game can ask again without using up the task |
 | Is ready | `Order` | `isReady()` | `public boolean isReady()` | |
 | Mark served | `Order` | `markServed()` | `public void markServed()` | Only allowed when READY |
-| Get bill | `Order` | `getBill()` | `public int getBill()` | Integer **cents** (e.g. 1800 = $18.00) |
+| Get bill | `Order` | `getBill()` | `public int getBill()` | Integer **cents** (e.g. 1800 = $18.00). Stage 1: the item price (no discounts). Throws for a CANCELLED order (D3) |
+| *Proposed by B:* Mark paid | `Order` | `markPaid()` | `public void markPaid()` | Cashier, after `customer.pay()`. Only allowed when SERVED |
+| *Proposed by B:* Cancel order | `Order` | `cancel()` | `public void cancel()` | Controller, when the customer has left (D3). Only allowed when PLACED or READY |
+| *Proposed by B:* Whose order | `Order` | `getCustomer()` | `public Customer getCustomer()` | Also `getItem()`, `getStatus()`, `getUnitsDone()`, `getTurnPlaced()` for the display |
+| *Proposed by B:* Show money | `Money` | `Money.format(cents)` | `public static String format(int cents)` | 1800 → `"$18.00"`. The only place cents become dollar text |
+| *Proposed by B:* The menu | `Menu` | `Menu.standard()` | `public static Menu standard()` | Salad $9.00 (1 unit), Burger $15.00 (1), Pasta $18.00 (2), in that order (Robin's seed relies on it) |
 
 ## B → A (pricing calls Customer)
 | Need | Class | Agreed method | Full signature *(proposed types)* | Notes |
@@ -36,11 +41,11 @@ Roles: A = Robin (Customers) · B = Ian (Kitchen, Menu & Pricing) · C = Caleb (
 |---|---|---|
 | Nothing reads the recorded satisfaction back | C needs it to compute the average satisfaction of paid customers | Add `public int getRecordedSatisfaction()` on `Customer` (C → A) |
 | B → A discount method not named | B can't compute the VIP bill without it | Agree a name before Stage 1 ends (Regular returns 0) |
-| Owner class of `createOrder` | Decides which folder it lives in | `Order` (B's folder) |
+| ~~Owner class of `createOrder`~~ | Decides which folder it lives in | **Settled:** `Order` (B's folder) |
 
 ## Shared types
 | Type | Owner | Values / members |
 |---|---|---|
 | `CustomerState` enum | A | *to fill, e.g.* WAITING, SEATED, ORDERED, EATING, READY_TO_PAY, PAID, LEFT |
-| `OrderStatus` enum | B | *to fill, e.g.* PLACED, PREPARING, READY, SERVED, PAID, CANCELLED |
-| `MenuItem`, `Menu` | B | |
+| `OrderStatus` enum | B | PLACED, READY, SERVED, PAID, CANCELLED. Progress while PLACED is `getUnitsDone()` out of `getItem().getPrepUnits()` |
+| `MenuItem`, `Menu` | B | `MenuItem`: `getName()`, `getPriceCents()`, `getPrepUnits()`, `toString()` e.g. `"Pasta $18.00 (2 units)"`. `Menu`: `getItems()` (read-only list, menu order) |
