@@ -1,11 +1,18 @@
 package restaurant.app;
 
-/**
- * Entry point for Restaurant Rush.
- * Placeholder until the Week 1 walking skeleton replaces it.
- */
+import restaurant.boundary.ConsoleUI;
+import restaurant.control.ArrivalSchedule;
+import restaurant.control.GameConfig;
+import restaurant.control.GameController;
+import restaurant.menu.Menu;
+
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Restaurant Rush - project setup OK");
+        GameController game = new GameController(
+            new ConsoleUI(System.in, System.out),
+            new ArrivalSchedule(GameConfig.ARRIVAL_TURNS),
+            Menu.standard(),
+            GameConfig.TABLE_COUNT);
+        game.play();
     }
 }
