@@ -1,5 +1,11 @@
 package restaurant.customer;
 
+import java.util.List;
+import java.util.Random;
+
+import restaurant.menu.Menu;
+import restaurant.menu.MenuItem;
+
 /**
  * A customer in the restaurant (Stage 1).
  * Keeps its own satisfaction and state. The state only changes through the
@@ -26,23 +32,20 @@ public class Customer {
         state = CustomerState.SEATED;
     }
 
-    /*
-     * TODO: uncomment once Ian's Menu and MenuItem exist (needs a way to list the menu's items).
-     *
+    /**
      * The Waiter takes the order: SEATED -> ORDERED. The customer picks its own dish
      * (DECISIONS D5): customer n always uses new Random(SEED + n), so every run is the same.
-     *
-     * public MenuItem chooseFood(Menu menu) {
-     *     if (menu == null) {
-     *         throw new IllegalArgumentException("menu must not be null");
-     *     }
-     *     requireState(CustomerState.SEATED);
-     *     List<MenuItem> items = menu.getItems();
-     *     MenuItem dish = items.get(new Random(SEED + id).nextInt(items.size()));
-     *     state = CustomerState.ORDERED;
-     *     return dish;
-     * }
      */
+    public MenuItem chooseFood(Menu menu) {
+        if (menu == null) {
+            throw new IllegalArgumentException("menu must not be null");
+        }
+        requireState(CustomerState.SEATED);
+        List<MenuItem> items = menu.getItems();
+        MenuItem dish = items.get(new Random(SEED + id).nextInt(items.size()));
+        state = CustomerState.ORDERED;
+        return dish;
+    }
 
     /** The Waiter serves the food: ORDERED -> EATING. */
     public void serve() {
