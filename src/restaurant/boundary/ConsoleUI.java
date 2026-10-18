@@ -55,11 +55,6 @@ public class ConsoleUI implements GameView {
 
     @Override 
     public void showResults(GameResult r, boolean finalResult) {
-
-    }
-
-    @Override 
-    public void showResults(GameResult r, boolean finalResult) {
         out.println(finalResult ? "-------- FINAL RESULTS --------"
             : "-- End of turn " + r.turnsUsed() + " --");
         out.println("Customers served and paid: " + r.customersPaid());
