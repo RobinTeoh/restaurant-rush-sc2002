@@ -18,7 +18,7 @@ public class Waiter {
         if (customer == null) {
             return ActionResult.failure("Nobody is waiting in the queue.");
         }
-        if (table == null || table.isFree()) {
+        if (table == null || !table.isFree()) {
             return ActionResult.failure("There is no free table.");
 
         }
