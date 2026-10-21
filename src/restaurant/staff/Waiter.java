@@ -8,6 +8,7 @@ import restaurant.customer.CustomerState;
 import restaurant.menu.Menu;
 import restaurant.menu.MenuItem;
 import restaurant.order.Order;
+import restaurant.order.OrderStatus;
 import restaurant.place.Table;
 import restaurant.place.WaitingQueue;
 
@@ -50,6 +51,10 @@ public class Waiter {
         }
         if (order == null) {
             return ActionResult.failure("Customer " + customer.getId() + " has not ordered yet.");
+        }
+        if (order.getStatus() == OrderStatus.SERVED || order.getStatus() == OrderStatus.PAID) {
+            return ActionResult.failure("Customer " + customer.getId() + "'s "
+                    + order.getItem().getName() + " has already been served.");  
         }
         if (!order.isReady()) {
             return ActionResult.failure("Customer " + customer.getId() + "'s " + order.getItem().getName()
