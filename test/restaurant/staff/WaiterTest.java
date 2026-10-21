@@ -109,4 +109,20 @@ class WaiterTest {
         assertTrue(waiter.serve(c, order).ok());
         assertEquals(CustomerState.EATING, c.getState());
     }
+    @Test
+    void serveFailsWhenTheDishWasAlreadyServed() {
+        Customer c = seatedCustomer(1);
+        waiter.takeOrder(c, menu, 1, orders);
+        Order order = orders.get(0);
+        Chef chef = new Chef();
+        while (!order.isReady()) {
+            chef.work(order);
+        }
+        waiter.serve(c, order);
+
+        ActionResult again = waiter.serve(c, order);
+        assertFalse(again.ok());
+        assertEquals("Customer 1's Salad has already been served.", again.message());
+        assertEquals(CustomerState.EATING, c.getState(), "a failed action changes nothing");
+    }
 }
