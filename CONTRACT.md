@@ -8,13 +8,22 @@ Roles: A = Robin (Customers) · B = Ian (Kitchen, Menu & Pricing) · C = Caleb (
 **Method names are agreed (12 Oct 2026).** Types marked *(proposed)* were not stated at the meeting; confirm or change them before coding against them.
 
 ## C → A (game loop calls Customer)
-| Need | Class | Agreed method | Full signature *(proposed types)* | Notes |
+
+Implemented in Stage 1 (`Customer.java`). A call made in the wrong state throws `IllegalStateException`; the Waiter and controller check `getState()` first and show the player a reason (brief §3.4).
+
+| Need | Class | Method | Signature | Notes |
 |---|---|---|---|---|
-| Lose satisfaction | `Customer` | `loseSatisfaction()` | `public void loseSatisfaction()` | Called at turn end. The customer applies its own loss (Regular 8, later VIP 5, Critic 12), minimum 0, and only while waiting or seated-not-served. At 0 the customer becomes LEFT. |
+| Create a customer | `Customer` | constructor | `public Customer(int id)` | Satisfaction 100, WAITING. Ids are 1, 2, 3... in arrival order (the food seed uses the id). |
+| Lose satisfaction | `Customer` | `loseSatisfaction()` | `public void loseSatisfaction()` | Called on **every** customer at turn end. Loses 8 only in WAITING, SEATED or ORDERED, never below 0; at 0 the customer becomes LEFT. Does nothing in any other state (no exception). |
 | Check if left | `Customer` | `hasLeft()` | `public boolean hasLeft()` | True once satisfaction hit 0 |
-| Choose food | `Customer` | `chooseFood(menu)` | `public MenuItem chooseFood(Menu menu)` | Uses DECISIONS D5 (seeded random, max 2 Pasta) |
+| Choose food | `Customer` | `chooseFood(menu)` | `public MenuItem chooseFood(Menu menu)` | SEATED → ORDERED, so taking the order is one call. Picks with `new Random(SEED + id)` (DECISIONS D5/D6). |
 | Get state | `Customer` | `getState()` | `public CustomerState getState()` | |
-| Record satisfaction at payment | `Customer` | `recordSatisfactionAtPayment()` | `public void recordSatisfactionAtPayment()` | Stores the current satisfaction for the average |
+| *Added:* Seat | `Customer` | `seat()` | `public void seat()` | WAITING → SEATED. The customer does not store its table (`Table` knows its occupant). |
+| *Added:* Serve | `Customer` | `serve()` | `public void serve()` | ORDERED → EATING |
+| *Added:* Finish eating | `Customer` | `finishEating()` | `public void finishEating()` | EATING → READY_TO_PAY. The **controller** decides when one full turn has passed. |
+| *Changed:* Pay | `Customer` | `pay()` | `public void pay()` | READY_TO_PAY → PAID. **Replaces** the agreed `recordSatisfactionAtPayment()`: one call cannot be done halfway. Satisfaction cannot change after SERVED, so the recorded value is the current one. |
+| Read recorded satisfaction | `Customer` | `getRecordedSatisfaction()` | `public int getRecordedSatisfaction()` | Only valid once PAID (throws before). Used for the average. |
+| *Added:* Display | `Customer` | `getId()`, `getSatisfaction()` | `public int getId()`, `public int getSatisfaction()` | For the start-of-turn display |
 
 ## C → B (game loop calls kitchen and orders)
 | Need | Class | Agreed method | Full signature *(proposed types)* | Notes |
@@ -33,19 +42,19 @@ Roles: A = Robin (Customers) · B = Ian (Kitchen, Menu & Pricing) · C = Caleb (
 ## B → A (pricing calls Customer)
 | Need | Class | Agreed method | Full signature *(proposed types)* | Notes |
 |---|---|---|---|---|
-| Get discount for this customer | `Customer` | ***not agreed yet*** | e.g. `public int getDiscountPercent()` | Regular 0, VIP 10 (Stage 2). Rounding per D1 |
-| *To confirm:* Happy Hour recovery | `Customer` | ***not agreed yet*** | e.g. `public void recover(int points)` | +15, capped at 100 (Stage 3) |
+| Get discount for this customer | `Customer` | **Stage 2** | e.g. `public int getDiscountPercent()` | **Not in Stage 1:** the bill is the item price. Added in Stage 2 with `VIPCustomer` (VIP 10). Rounding per D1. |
+| *To confirm:* Happy Hour recovery | `Customer` | **Stage 3** | e.g. `public void recover(int points)` | +15, capped at 100 (Stage 3) |
 
-## Gaps to settle (found while filling this in)
-| Gap | Why it matters | Suggestion |
-|---|---|---|
-| Nothing reads the recorded satisfaction back | C needs it to compute the average satisfaction of paid customers | Add `public int getRecordedSatisfaction()` on `Customer` (C → A) |
-| B → A discount method not named | B can't compute the VIP bill without it | Agree a name before Stage 1 ends (Regular returns 0) |
-| ~~Owner class of `createOrder`~~ | Decides which folder it lives in | **Settled:** `Order` (B's folder) |
+## Gaps (status)
+| Gap | Status |
+|---|---|
+| Nothing reads the recorded satisfaction back | **Settled:** `Customer.getRecordedSatisfaction()` (see C → A) |
+| B → A discount method not named | **Moved to Stage 2** (see above) |
+| ~~Owner class of `createOrder`~~ | **Settled:** `Order` (B's folder) |
 
 ## Shared types
 | Type | Owner | Values / members |
 |---|---|---|
-| `CustomerState` enum | A | *to fill, e.g.* WAITING, SEATED, ORDERED, EATING, READY_TO_PAY, PAID, LEFT |
+| `CustomerState` enum | A | WAITING, SEATED, ORDERED, EATING, READY_TO_PAY, PAID, LEFT. `losesSatisfaction()` is true for WAITING, SEATED and ORDERED. |
 | `OrderStatus` enum | B | PLACED, READY, SERVED, PAID, CANCELLED. Progress while PLACED is `getUnitsDone()` out of `getItem().getPrepUnits()` |
 | `MenuItem`, `Menu` | B | `MenuItem`: `getName()`, `getPriceCents()`, `getPrepUnits()`, `toString()` e.g. `"Pasta $18.00 (2 units)"`. `Menu`: `getItems()` (read-only list, menu order) |
