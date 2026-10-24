@@ -17,4 +17,15 @@ public final class Money {
         }
         return String.format("$%d.%02d", cents / 100, cents % 100);
     }
+
+    /** Takes percent off, rounded half-up to the nearest cent (DECISIONS D1). 1500, 10 -> 1350. */
+    public static int percentOff(int cents, int percent) {
+        if (cents < 0) {
+            throw new IllegalArgumentException("cents must not be negative");
+        }
+        if (percent < 0 || percent > 100) {
+            throw new IllegalArgumentException("percent must be 0 to 100");
+        }
+        return (cents * (100 - percent) + 50) / 100;
+    }
 }
