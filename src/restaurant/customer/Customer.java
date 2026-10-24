@@ -6,75 +6,60 @@ import java.util.Random;
 import restaurant.menu.Menu;
 import restaurant.menu.MenuItem;
 
-/**
- * A customer in the restaurant (Stage 1).
- * Keeps its own satisfaction and state. The state only changes through the
- * event methods below, and each one checks the current state first.
- */
-public class Customer {
-    private static final int LOSS_PER_TURN = 8;
+// parent of every customer type, the state rules live here only
+// the event methods are final so a subclass cannot break the state flow,
+// subclasses only change their numbers (loss, discount) and how they pick food
+public abstract class Customer {
     private static final int MAX_SATISFACTION = 100;
-    private static final long SEED = 32; // used by chooseFood; to confirm with the team (DECISIONS D6)
+    private static final long SEED = 32; // fixed so every run orders the same food (D5/D6)
 
     private final int id;
     private int satisfaction;
     private CustomerState state;
 
-    public Customer(int id) {
+    protected Customer(int id) {
         this.id = id;
         this.satisfaction = MAX_SATISFACTION;
         this.state = CustomerState.WAITING;
     }
 
-    /** The Waiter seats this customer: WAITING -> SEATED. */
-    public void seat() {
+    public final void seat() {
         requireState(CustomerState.WAITING); //customer need be waiting in order to seat
         state = CustomerState.SEATED;
     }
 
-    /**
-     * The Waiter takes the order: SEATED -> ORDERED. The customer picks its own dish
-     * (DECISIONS D5): customer n always uses new Random(SEED + n), so every run is the same.
-     */
-    public MenuItem chooseFood(Menu menu) {
+    // waiter takes the order, customer picks its own dish
+    public final MenuItem chooseFood(Menu menu) {
         if (menu == null) {
             throw new IllegalArgumentException("menu must not be null");
         }
         requireState(CustomerState.SEATED);
-        List<MenuItem> items = menu.getItems();
-        MenuItem dish = items.get(new Random(SEED + id).nextInt(items.size()));
+        MenuItem dish = pickDish(menu.getItems());
         state = CustomerState.ORDERED;
         return dish;
     }
 
-    /** The Waiter serves the food: ORDERED -> EATING. */
-    public void serve() {
+    public final void serve() {
         requireState(CustomerState.ORDERED);
         state = CustomerState.EATING;
     }
 
-    /** One full turn of eating is over: EATING -> READY_TO_PAY. */
-    public void finishEating() {
+    public final void finishEating() {
         requireState(CustomerState.EATING);
         state = CustomerState.READY_TO_PAY;
     }
 
-    /** The Cashier collects payment: READY_TO_PAY -> PAID. The satisfaction is now final. */
-    public void pay() {
+    public final void pay() {
         requireState(CustomerState.READY_TO_PAY);
         state = CustomerState.PAID;
     }
 
-    /**
-     * Called on every customer at turn end. Only customers still waiting for a table
-     * or for their food lose satisfaction; at 0 the customer leaves.
-     * Does nothing in any other state.
-     */
-    public void loseSatisfaction() {
+    // called on every customer at turn end, only the ones still waiting lose satisfaction
+    public final void loseSatisfaction() {
         if (!state.losesSatisfaction()) {
             return;
         }
-        satisfaction = Math.max(0, satisfaction - LOSS_PER_TURN);
+        satisfaction = Math.max(0, satisfaction - satisfactionLossPerTurn());
         if (satisfaction == 0) {
             state = CustomerState.LEFT;
         }
@@ -88,10 +73,7 @@ public class Customer {
         return state;
     }
 
-    /**
-     * The satisfaction recorded at payment, used for the average of paid customers.
-     * Satisfaction cannot change after the customer is served, so this is the current value.
-     */
+    // satisfaction cannot change after serving, so at payment the current value is the recorded one
     public int getRecordedSatisfaction() {
         requireState(CustomerState.PAID);
         return satisfaction;
@@ -103,6 +85,20 @@ public class Customer {
 
     public int getSatisfaction() {
         return satisfaction;
+    }
+
+    // percent off the bill, only VIP gets one
+    public int getDiscountPercent() {
+        return 0;
+    }
+
+    public abstract String getTypeName();
+
+    protected abstract int satisfactionLossPerTurn();
+
+    // default food choice, same seed rule as stage 1, critic overrides this
+    protected MenuItem pickDish(List<MenuItem> items) {
+        return items.get(new Random(SEED + id).nextInt(items.size()));
     }
 
     private void requireState(CustomerState expected) {

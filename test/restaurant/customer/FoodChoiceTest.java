@@ -55,7 +55,7 @@ class FoodChoiceTest {
         Menu menu = Menu.standard();
         List<MenuItem> dishes = new ArrayList<>();
         for (int id = 1; id <= CUSTOMERS; id++) {
-            Customer c = new Customer(id);
+            Customer c = new RegularCustomer(id);
             c.seat();
             dishes.add(c.chooseFood(menu));
         }

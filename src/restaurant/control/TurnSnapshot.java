@@ -15,7 +15,7 @@ public record TurnSnapshot (
     
     public record TableLine(int tableId, Integer customerId) { }
 
-    public record CustomerLine(int id, int satisfaction, String state, String order) { }
+    public record CustomerLine(int id, String type, int satisfaction, String state, String order) { }
 
     
 }

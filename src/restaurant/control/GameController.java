@@ -40,7 +40,6 @@ public class GameController {
     private final Map<Customer, Integer> servedOnTurn = new HashMap<>();
 
     private int turn;
-    private int nextCustomerId = 1;
 
     public GameController(GameView view, ArrivalSchedule schedule, Menu menu, int tableCount) {
         this.view = view;
@@ -77,11 +76,11 @@ public class GameController {
 
     // Arrivals
     private void arrivals() {
-        for (int i = 0; i < schedule.arrivalsOn(turn); i++) {
-            Customer customer = new Customer(nextCustomerId++);
+        for (Customer customer : schedule.arrivalsOn(turn)) {
             customers.add(customer);
             queue.add(customer);
-            view.showMessage("Customer " + customer.getId() + " arrives and joins the queue.");
+            view.showMessage("Customer " + customer.getId() + " (" + customer.getTypeName()
+                + ") arrives and joins the queue.");
         }
     }
 
@@ -257,7 +256,8 @@ public class GameController {
     private static List<String> labels(List<Customer> list) {
         List<String> labels = new ArrayList<>();
         for (Customer c : list) {
-            labels.add("Customer " + c.getId() + " (satisfaction " + c.getSatisfaction() + ", " + c.getState() + ")");
+            labels.add("Customer " + c.getId() + " (" + c.getTypeName() + ", satisfaction " + c.getSatisfaction()
+                + ", " + c.getState() + ")");
         }
         return labels;
     }
@@ -284,7 +284,8 @@ public class GameController {
             Order o = orderOf(c);
             String order = o == null ? "none" : o.getItem().getName() + " (" + o.getStatus() + ", "
                 + o.getUnitsDone() + "/" + o.getItem().getPrepUnits() + " units)";
-            lines.add(new TurnSnapshot.CustomerLine(c.getId(), c.getSatisfaction(), c.getState().toString(), order));
+            lines.add(new TurnSnapshot.CustomerLine(c.getId(), c.getTypeName(), c.getSatisfaction(),
+                c.getState().toString(), order));
         }
         return new TurnSnapshot(turn, GameConfig.TOTAL_TURNS, stats.getRevenueCents(), 
                 stats.averageSatisfaction(), queued, tableLines, lines, STAFF_TASKS);

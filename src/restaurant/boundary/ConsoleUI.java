@@ -38,8 +38,8 @@ public class ConsoleUI implements GameView {
             out.println(". (none)");
         }
         for (TurnSnapshot.CustomerLine c : s.customers()) {
-            out.printf("  Customer %d  satisfaction %3d %-13s order: %s%n", 
-                c.id(), c.satisfaction(), c.state(), c.order());
+            out.printf("  Customer %d %-9s satisfaction %3d %-13s order: %s%n",
+                c.id(), "(" + c.type() + ")", c.satisfaction(), c.state(), c.order());
         }
         out.println("Staff tasks:");
         for (String task : s.staffTasks()) {
