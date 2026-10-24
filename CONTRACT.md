@@ -10,13 +10,15 @@ Roles: A = Robin (Customers) · B = Ian (Kitchen, Menu & Pricing) · C = Caleb (
 ## C → A (game loop calls Customer)
 
 Implemented in Stage 1 (`Customer.java`). A call made in the wrong state throws `IllegalStateException`; the Waiter and controller check `getState()` first and show the player a reason (brief §3.4).
+**Stage 2:** `Customer` is abstract with three types. The event methods (`seat`, `chooseFood`, `serve`, `finishEating`, `pay`, `loseSatisfaction`) are `final`, so every type follows the same flow; the types differ only through `satisfactionLossPerTurn()`, `getDiscountPercent()` and `pickDish()`.
 
 | Need | Class | Method | Signature | Notes |
 |---|---|---|---|---|
-| Create a customer | `Customer` | constructor | `public Customer(int id)` | Satisfaction 100, WAITING. Ids are 1, 2, 3... in arrival order (the food seed uses the id). |
-| Lose satisfaction | `Customer` | `loseSatisfaction()` | `public void loseSatisfaction()` | Called on **every** customer at turn end. Loses 8 only in WAITING, SEATED or ORDERED, never below 0; at 0 the customer becomes LEFT. Does nothing in any other state (no exception). |
+| Create a customer | `RegularCustomer`, `VIPCustomer`, `CriticCustomer` | constructor | e.g. `public VIPCustomer(int id)` | **Stage 2:** `Customer` is abstract, so create one of the three types. Satisfaction 100, WAITING. Ids are 1, 2, 3... in arrival order (the food seed uses the id). The game gets its customers from `ArrivalSchedule`; only setup code (`GameConfig`, tests) names the types. |
+| Lose satisfaction | `Customer` | `loseSatisfaction()` | `public final void loseSatisfaction()` | Called on **every** customer at turn end. Loses the customer type's amount (Regular 8, VIP 5, Critic 12) only in WAITING, SEATED or ORDERED, never below 0; at 0 the customer becomes LEFT. Does nothing in any other state (no exception). |
+| *Stage 2:* Type name | `Customer` | `getTypeName()` | `public String getTypeName()` | "Regular", "VIP" or "Critic", for the display only. Never used for decisions. |
 | Check if left | `Customer` | `hasLeft()` | `public boolean hasLeft()` | True once satisfaction hit 0 |
-| Choose food | `Customer` | `chooseFood(menu)` | `public MenuItem chooseFood(Menu menu)` | SEATED → ORDERED, so taking the order is one call. Picks with `new Random(SEED + id)` (DECISIONS D5/D6). |
+| Choose food | `Customer` | `chooseFood(menu)` | `public final MenuItem chooseFood(Menu menu)` | SEATED → ORDERED, so taking the order is one call. Regular and VIP pick with `new Random(SEED + id)` (D5/D6); the Critic always picks the most expensive dish (D7). |
 | Get state | `Customer` | `getState()` | `public CustomerState getState()` | |
 | *Added:* Seat | `Customer` | `seat()` | `public void seat()` | WAITING → SEATED. The customer does not store its table (`Table` knows its occupant). |
 | *Added:* Serve | `Customer` | `serve()` | `public void serve()` | ORDERED → EATING |
@@ -32,7 +34,9 @@ Implemented in Stage 1 (`Customer.java`). A call made in the wrong state throws 
 | Chef works on order | `Chef` | `chef.work(order)` | `public boolean work(Order order)` | Advances one prep unit. Returns `false` (no change) if the order is READY, SERVED, PAID or CANCELLED, so the game can ask again without using up the task |
 | Is ready | `Order` | `isReady()` | `public boolean isReady()` | |
 | Mark served | `Order` | `markServed()` | `public void markServed()` | Only allowed when READY |
-| Get bill | `Order` | `getBill()` | `public int getBill()` | Integer **cents** (e.g. 1800 = $18.00). Stage 1: the item price (no discounts). Throws for a CANCELLED order (D3) |
+| Get bill | `Order` | `getBill()` | `public int getBill()` | Integer **cents** (e.g. 1800 = $18.00). **Stage 2:** item price less the customer's discount, via `Money.percentOff` (VIP Burger 1350). Throws for a CANCELLED order (D3) |
+| *Stage 2:* Percent off | `Money` | `Money.percentOff(cents, percent)` | `public static int percentOff(int cents, int percent)` | D1 half-up rounding; the only place a percentage is applied |
+| *Stage 2:* Who arrives | `ArrivalSchedule` | `arrivalsOn(turn)` | `public List<Customer> arrivalsOn(int turn)` | **Changed** from a count to the customers themselves. New constructor `ArrivalSchedule(List<Integer> turns, List<Customer> customers)`; the turns-only constructor means all Regular. |
 | *Proposed by B:* Mark paid | `Order` | `markPaid()` | `public void markPaid()` | Cashier, after `customer.pay()`. Only allowed when SERVED |
 | *Proposed by B:* Cancel order | `Order` | `cancel()` | `public void cancel()` | Controller, when the customer has left (D3). Only allowed when PLACED or READY |
 | *Proposed by B:* Whose order | `Order` | `getCustomer()` | `public Customer getCustomer()` | Also `getItem()`, `getStatus()`, `getUnitsDone()`, `getTurnPlaced()` for the display |
@@ -42,14 +46,14 @@ Implemented in Stage 1 (`Customer.java`). A call made in the wrong state throws 
 ## B → A (pricing calls Customer)
 | Need | Class | Agreed method | Full signature *(proposed types)* | Notes |
 |---|---|---|---|---|
-| Get discount for this customer | `Customer` | **Stage 2** | e.g. `public int getDiscountPercent()` | **Not in Stage 1:** the bill is the item price. Added in Stage 2 with `VIPCustomer` (VIP 10). Rounding per D1. |
+| Get discount for this customer | `Customer` | `getDiscountPercent()` | `public int getDiscountPercent()` | **Stage 2.** 0 by default, `VIPCustomer` returns 10. Read by `Order.getBill()`. Rounding per D1. |
 | *To confirm:* Happy Hour recovery | `Customer` | **Stage 3** | e.g. `public void recover(int points)` | +15, capped at 100 (Stage 3) |
 
 ## Gaps (status)
 | Gap | Status |
 |---|---|
 | Nothing reads the recorded satisfaction back | **Settled:** `Customer.getRecordedSatisfaction()` (see C → A) |
-| B → A discount method not named | **Moved to Stage 2** (see above) |
+| B → A discount method not named | **Settled in Stage 2:** `getDiscountPercent()` |
 | ~~Owner class of `createOrder`~~ | **Settled:** `Order` (B's folder) |
 
 ## Shared types
