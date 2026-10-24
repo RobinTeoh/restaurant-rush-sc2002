@@ -10,7 +10,7 @@ public class Main {
     public static void main(String[] args) {
         GameController game = new GameController(
             new ConsoleUI(System.in, System.out),
-            new ArrivalSchedule(GameConfig.ARRIVAL_TURNS),
+            new ArrivalSchedule(GameConfig.ARRIVAL_TURNS, GameConfig.baseCustomers()),
             Menu.standard(),
             GameConfig.TABLE_COUNT);
         game.play();

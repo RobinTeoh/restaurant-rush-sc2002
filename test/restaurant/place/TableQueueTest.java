@@ -11,6 +11,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import restaurant.customer.Customer;
+import restaurant.customer.RegularCustomer;
 
 class TableQueueTest {
 
@@ -24,7 +25,7 @@ class TableQueueTest {
     @Test
     void tableCanBeAssignedAndReleased() {
         Table table = new Table(1);
-        Customer c = new Customer(1);
+        Customer c = new RegularCustomer(1);
         table.assign(c);
         assertFalse(table.isFree());
         assertEquals(c, table.getOccupant());
@@ -35,15 +36,15 @@ class TableQueueTest {
     @Test
     void occupiedTableRefusesASecondCustomer() {
         Table table = new Table(1);
-        table.assign(new Customer(1));
-        assertThrows(IllegalStateException.class, () -> table.assign(new Customer(2)));
+        table.assign(new RegularCustomer(1));
+        assertThrows(IllegalStateException.class, () -> table.assign(new RegularCustomer(2)));
     }
 
     @Test
     void queueKeepsArrivalOrder() {
         WaitingQueue queue = new WaitingQueue();
-        Customer c1 = new Customer(1);
-        Customer c2 = new Customer(2);
+        Customer c1 = new RegularCustomer(1);
+        Customer c2 = new RegularCustomer(2);
         queue.add(c1);
         queue.add(c2);
         assertEquals(List.of(c1, c2), queue.list());
@@ -52,9 +53,9 @@ class TableQueueTest {
     @Test
     void anyCustomerCanBeRemovedFromTheMiddle() {
         WaitingQueue queue = new WaitingQueue();
-        Customer c1 = new Customer(1);
-        Customer c2 = new Customer(2);
-        Customer c3 = new Customer(3);
+        Customer c1 = new RegularCustomer(1);
+        Customer c2 = new RegularCustomer(2);
+        Customer c3 = new RegularCustomer(3);
         queue.add(c1);
         queue.add(c2);
         queue.add(c3);
@@ -65,7 +66,7 @@ class TableQueueTest {
     @Test
     void sameCustomerCannotBeQueuedTwice() {
         WaitingQueue queue = new WaitingQueue();
-        Customer c = new Customer(1);
+        Customer c = new RegularCustomer(1);
         queue.add(c);
         assertThrows(IllegalStateException.class, () -> queue.add(c));
     }
@@ -73,7 +74,7 @@ class TableQueueTest {
     @Test
     void listCannotBeChangedFromOutside() {
         WaitingQueue queue = new WaitingQueue();
-        queue.add(new Customer(1));
+        queue.add(new RegularCustomer(1));
         assertThrows(UnsupportedOperationException.class, () -> queue.list().clear());
     }
 }

@@ -14,7 +14,7 @@ class CustomerTest {
 
     @Test
     void newCustomerIsWaitingWithFullSatisfaction() {
-        Customer c = new Customer(1);
+        Customer c = new RegularCustomer(1);
         assertEquals(1, c.getId());
         assertEquals(CustomerState.WAITING, c.getState());
         assertEquals(100, c.getSatisfaction());
@@ -23,14 +23,14 @@ class CustomerTest {
 
     @Test
     void seatMovesWaitingToSeated() {
-        Customer c = new Customer(1);
+        Customer c = new RegularCustomer(1);
         c.seat();
         assertEquals(CustomerState.SEATED, c.getState());
     }
 
     @Test
     void waitingCustomerLoses8PerTurn() {
-        Customer c = new Customer(1);
+        Customer c = new RegularCustomer(1);
         c.loseSatisfaction();
         assertEquals(92, c.getSatisfaction());
     }
@@ -38,7 +38,7 @@ class CustomerTest {
     @Test
     void seatedCustomerAlsoLosesSatisfaction() {
         // Brief §3.3 turn 1: seated, not served -> 92 at turn end.
-        Customer c = new Customer(1);
+        Customer c = new RegularCustomer(1);
         c.seat();
         c.loseSatisfaction();
         assertEquals(92, c.getSatisfaction());
@@ -46,7 +46,7 @@ class CustomerTest {
 
     @Test
     void customerLeftAloneForThirteenTurnsLeaves() {
-        Customer c = new Customer(1);
+        Customer c = new RegularCustomer(1);
         for (int turn = 1; turn <= 12; turn++) {
             c.loseSatisfaction();
         }
@@ -69,7 +69,7 @@ class CustomerTest {
 
     @Test
     void cannotSeatACustomerTwice() {
-        Customer c = new Customer(1);
+        Customer c = new RegularCustomer(1);
         c.seat();
         assertThrows(IllegalStateException.class, c::seat);
     }
@@ -82,7 +82,7 @@ class CustomerTest {
 
     @Test
     void laterStepsCannotBeSkipped() {
-        Customer c = new Customer(1);
+        Customer c = new RegularCustomer(1);
         assertThrows(IllegalStateException.class, c::serve);
         assertThrows(IllegalStateException.class, c::finishEating);
         assertThrows(IllegalStateException.class, c::pay);
@@ -91,14 +91,14 @@ class CustomerTest {
 
     @Test
     void recordedSatisfactionIsOnlyAvailableAfterPayment() {
-        Customer c = new Customer(1);
+        Customer c = new RegularCustomer(1);
         assertThrows(IllegalStateException.class, c::getRecordedSatisfaction);
     }
 
     @Test
     void chooseFoodMovesSeatedToOrderedAndReturnsADishFromTheMenu() {
         Menu menu = Menu.standard();
-        Customer c = new Customer(1);
+        Customer c = new RegularCustomer(1);
         c.seat();
         MenuItem dish = c.chooseFood(menu);
         assertTrue(menu.getItems().contains(dish));
@@ -108,10 +108,10 @@ class CustomerTest {
     @Test
     void chooseFoodNeedsASeatedCustomer() {
         Menu menu = Menu.standard();
-        Customer waiting = new Customer(1);
+        Customer waiting = new RegularCustomer(1);
         assertThrows(IllegalStateException.class, () -> waiting.chooseFood(menu));
 
-        Customer ordered = new Customer(2);
+        Customer ordered = new RegularCustomer(2);
         ordered.seat();
         ordered.chooseFood(menu);
         assertThrows(IllegalStateException.class, () -> ordered.chooseFood(menu));
@@ -119,7 +119,7 @@ class CustomerTest {
 
     @Test
     void chooseFoodRejectsAMissingMenu() {
-        Customer c = new Customer(1);
+        Customer c = new RegularCustomer(1);
         c.seat();
         assertThrows(IllegalArgumentException.class, () -> c.chooseFood(null));
         assertEquals(CustomerState.SEATED, c.getState());
@@ -129,7 +129,7 @@ class CustomerTest {
     void pastaExampleFromTheBrief() {
         // Brief §3.3. With SEED = 32, customer 3 orders Pasta (see FoodChoiceTest).
         Menu menu = Menu.standard();
-        Customer c = new Customer(3);
+        Customer c = new RegularCustomer(3);
 
         // Turn 1: arrives, seated.
         c.seat();
@@ -164,7 +164,7 @@ class CustomerTest {
     }
 
     private static Customer leaveAfterThirteenTurns() {
-        Customer c = new Customer(1);
+        Customer c = new RegularCustomer(1);
         for (int turn = 1; turn <= 13; turn++) {
             c.loseSatisfaction();
         }

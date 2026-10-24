@@ -2,9 +2,10 @@ package restaurant.order;
 
 import restaurant.customer.Customer;
 import restaurant.menu.MenuItem;
+import restaurant.pricing.Money;
 
 /**
- * One customer's order for one dish (Stage 1).
+ * One customer's order for one dish.
  * Keeps its own preparation progress and status. The status only changes through
  * the event methods below, and each one checks the current status first.
  */
@@ -76,14 +77,15 @@ public class Order {
     }
 
     /**
-     * The amount to pay, in cents. Stage 1 has no discounts, so this is the item price.
-     * MenuItem never changes, so the price is fixed from the moment the order is taken.
+     * The amount to pay, in cents: the item price less the customer's own discount
+     * (VIP 10%, everyone else 0). Neither the item nor the customer type changes,
+     * so the price is fixed from the moment the order is taken.
      */
     public int getBill() {
         if (status == OrderStatus.CANCELLED) {
             throw new IllegalStateException("a cancelled order has no bill (DECISIONS D3)");
         }
-        return item.getPriceCents();
+        return Money.percentOff(item.getPriceCents(), customer.getDiscountPercent());
     }
 
     public Customer getCustomer() {

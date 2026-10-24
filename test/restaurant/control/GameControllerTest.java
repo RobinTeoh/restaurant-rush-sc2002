@@ -4,10 +4,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
+import restaurant.customer.CriticCustomer;
 import restaurant.customer.Customer;
 import restaurant.customer.CustomerState;
+import restaurant.customer.VIPCustomer;
 import restaurant.menu.Menu;
 
 /**
@@ -117,5 +122,68 @@ class GameControllerTest {
         assertTrue(game.getCustomers().get(0).hasLeft());
         assertTrue(game.getTables().get(0).isFree());
         assertEquals(1, game.getStats().getUnhappyDepartures());
+    }
+
+    @Test
+    void turnSixteenCustomerCannotPayEvenWhenServedAsFastAsPossible() {
+        List<Integer> answers = new ArrayList<>();
+        for (int t = 1; t <= 15; t++) {
+            answers.addAll(List.of(3, 0)); // waiter waits, chef waits
+        }
+        answers.addAll(List.of(0, 4, 0)); // turn 16: seat customer 6 (last of 5 in the queue)
+        answers.addAll(List.of(1, 0, 0)); // turn 17: take the order, chef makes the Salad READY
+        answers.addAll(List.of(2, 0, 0)); // turn 18: serve it
+        GameController game = newGame(new ScriptedView(answers.stream().mapToInt(Integer::intValue).toArray()));
+        game.play();
+
+        Customer sixth = game.getCustomers().get(5);
+        assertEquals(CustomerState.EATING, sixth.getState(), "served on turn 18, would only pay on turn 20");
+        assertEquals(0, game.getStats().getPaidCount());
+    }
+
+    // stage 2 base setting
+
+    private GameController baseGame(ScriptedView view) {
+        return new GameController(view, new ArrivalSchedule(GameConfig.ARRIVAL_TURNS, GameConfig.baseCustomers()),
+                Menu.standard(), GameConfig.TABLE_COUNT);
+    }
+
+    @Test
+    void baseGameSeatsVipSecondAndCriticFourth() {
+        GameController game = baseGame(new ScriptedView());
+        game.play();
+        List<String> types = new ArrayList<>();
+        for (Customer c : game.getCustomers()) {
+            types.add(c.getTypeName());
+        }
+        assertEquals(List.of("Regular", "VIP", "Regular", "Critic", "Regular", "Regular"), types);
+        assertTrue(game.getCustomers().get(3).hasLeft(), "ignored critic (turn 10) loses 12 a turn and is gone by turn 18");
+        assertTrue(game.getCustomers().get(0).hasLeft(), "ignored regular from turn 1 leaves on turn 13");
+        assertFalse(game.getCustomers().get(1).hasLeft(), "ignored vip only loses 5 a turn");
+        assertEquals(2, game.getStats().getUnhappyDepartures());
+    }
+
+    @Test
+    void vipPaysTheDiscountedBill() {
+        // one VIP on turn 1, same steps as the salad test above
+        ScriptedView view = new ScriptedView(0, 0, 0, 1, 0, 0, 2, 0, 0);
+        GameController game = new GameController(view,
+                new ArrivalSchedule(List.of(1), List.of(new VIPCustomer(1))), Menu.standard(), GameConfig.TABLE_COUNT);
+        for (int t = 1; t <= 5; t++) {
+            game.playNextTurn();
+        }
+        assertEquals(810, game.getStats().getRevenueCents(), "Salad $9.00 less 10%");
+        assertEquals(90.0, game.getStats().averageSatisfaction().getAsDouble(), "vip lost 5 on two waiting turns");
+    }
+
+    @Test
+    void criticOrdersPastaInTheGame() {
+        ScriptedView view = new ScriptedView(0, 0, 0, 1, 0, 0); // seat, then take the order
+        GameController game = new GameController(view,
+                new ArrivalSchedule(List.of(1), List.of(new CriticCustomer(1))), Menu.standard(), GameConfig.TABLE_COUNT);
+        game.playNextTurn();
+        game.playNextTurn();
+        assertTrue(view.messages.contains("Customer 1 ordered Pasta $18.00 (2 units)."));
+        assertEquals(76, game.getCustomers().get(0).getSatisfaction(), "critic lost 12 on two waiting turns");
     }
 }

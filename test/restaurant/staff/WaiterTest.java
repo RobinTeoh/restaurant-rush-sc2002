@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import restaurant.control.ActionResult;
 import restaurant.customer.Customer;
+import restaurant.customer.RegularCustomer;
 import restaurant.customer.CustomerState;
 import restaurant.menu.Menu;
 import restaurant.order.Order;
@@ -24,7 +25,7 @@ class WaiterTest {
     private final List<Order> orders = new ArrayList<>();
 
     private Customer seatedCustomer(int id) {
-        Customer c = new Customer(id);
+        Customer c = new RegularCustomer(id);
         WaitingQueue queue = new WaitingQueue();
         queue.add(c);
         waiter.seat(c, new Table(1), queue);
@@ -40,14 +41,14 @@ class WaiterTest {
 
     @Test
     void seatFailsWhenNoTableIsFree() {
-        ActionResult r = waiter.seat(new Customer(1), null, new WaitingQueue());
+        ActionResult r = waiter.seat(new RegularCustomer(1), null, new WaitingQueue());
         assertFalse(r.ok());
         assertEquals("There is no free table.", r.message());
     }
 
     @Test
     void seatMovesCustomerFromQueueToTable() {
-        Customer c = new Customer(1);
+        Customer c = new RegularCustomer(1);
         WaitingQueue queue = new WaitingQueue();
         queue.add(c);
         Table table = new Table(1);

@@ -5,9 +5,15 @@ Replay one with `run.bat < runs\<file>` (Windows) or `sh run.sh < runs/<file>` (
 CI replays every `runs/stage<N>-victory*.txt` and `runs/stage<N>-defeat*.txt` and checks for VICTORY / DEFEAT.
 
 Base setting for every run: 18 turns, 2 tables, 1 Waiter / Chef / Cashier, arrivals on turns 1, 4, 7, 10, 13, 16,
-food chosen by `new Random(32 + customerId)` (DECISIONS D5/D6). Customers 1 to 6 order
-Salad, Burger, Pasta, Burger, Pasta, Salad ($9, $15, $18, $15, $18, $9).
+food chosen by `new Random(32 + customerId)` (DECISIONS D5/D6).
 Targets: at least 4 paid, revenue at least $45.00, average satisfaction of paid customers at least 60.
+
+* **Stage 1** (all Regular): customers 1 to 6 order Salad, Burger, Pasta, Burger, Pasta, Salad ($9, $15, $18, $15, $18, $9).
+* **Stage 2** (Regular, **VIP**, Regular, **Critic**, Regular, Regular): Salad, Burger, Pasta, **Pasta**, Pasta, Salad;
+  bills $9.00, **$13.50** (VIP 10% off), $18.00, $18.00 (the Critic always orders the most expensive dish), $18.00, $9.00.
+
+Run files are tied to their stage: `runs/stage1-*` replay at the `stage-1` tag, `runs/stage2-*` at `stage-2`.
+Stage 1 behaviour on the Stage 2 code is proven by the Stage 1 unit tests, which still pass unchanged (they use the all-Regular setting).
 
 ## Stage 1
 
@@ -48,7 +54,7 @@ Each file was replayed twice through the real console game (`run.bat < file`) an
 | 14 | Abandoned orders never add revenue (3.4) | `GameStatsTest.departuresAreCountedButNeverAddRevenue`, `Order.getBill` refuses a cancelled order |
 | 15 | Input ends early (piped file too short): remaining choices are Wait, no crash | `runs/stage1-edge-invalid-input.txt` (ends after 8 answers and still plays all 18 turns) |
 | 16 | Food is chosen by a documented, deterministic rule; at most 2 Pasta; four customers can reach $45 | `FoodChoiceTest` (4 tests) |
-| 17 | The turn-16 customer never pays; at most 5 customers pay (3.4) | Random-play check below (no unit test yet) |
+| 17 | The turn-16 customer never pays; at most 5 customers pay (3.4) | `GameControllerTest.turnSixteenCustomerCannotPayEvenWhenServedAsFastAsPossible` (added in Stage 2); random-play check below |
 
 ### Random-play check (50,000 games)
 
@@ -60,7 +66,7 @@ the victory flag is right, at most 5 paid, customer 6 never paid, and always exa
 
 ### Not yet covered by an automated test
 
-* The turn-16 customer never paying (edge case 17): checked by the random-play program above; worth adding as a unit test in `GameControllerTest`.
+* ~~The turn-16 customer never paying (edge case 17)~~ **Added in Stage 2:** `GameControllerTest.turnSixteenCustomerCannotPayEvenWhenServedAsFastAsPossible`.
 
 ### Known behaviours to document (not bugs)
 
@@ -69,5 +75,52 @@ the victory flag is right, at most 5 paid, customer 6 never paid, and always exa
 * The Chef's list also shows READY orders; choosing one is refused with a message and the Chef is asked again.
 
 ## Stage 2
+
+Base setting: Regular, **VIP** (arrives turn 4), Regular, **Critic** (arrives turn 10), Regular, Regular.
+
+### Reproducible runs
+
+| Run file | What the manager does | Result | Paid | Revenue | Avg satisfaction | Unhappy departures |
+|---|---|---|---|---|---|---|
+| `runs/stage2-victory.txt` | Waiter: serve a READY dish first, otherwise take an order, otherwise seat the first queued customer. Chef: cook the oldest order still being prepared. | **VICTORY** | 4 | $58.50 | 75.5 | 0 |
+| `runs/stage2-victory-5paid.txt` | Waiter: take an order first, then serve, then seat. Same Chef. | **VICTORY** | 5 | $76.50 | 73.2 | 0 |
+| `runs/stage2-defeat.txt` | Same Waiter as the first run, but the Chef is never given an order. | **DEFEAT** | 0 | $0.00 | N/A | 2 |
+
+Each file was replayed twice through the real console game (`run.bat < file`) with identical output, and CI's replay loop passes.
+$58.50 = $9.00 + **$13.50** (VIP Burger) + $18.00 + **$18.00** (Critic Pasta); the fifth customer adds another $18.00.
+
+### How the player's choices change the result (for the report)
+
+* Same 30 strategies as Stage 1: every strategy that cooks wins and only "the Chef never cooks" loses.
+  Average satisfaction now ranges from **70.5 to 75.5** (Stage 1: 76 to 80), because the Critic loses 12 per waiting turn.
+* **Waiter priority now decides whether a fifth customer pays**, not only an exceptional plan: taking orders before serving
+  gets 5 paid ($76.50) with no special turns; serving first gets 4 ($58.50).
+* **Ignoring the Critic costs more than ignoring anyone else:** an ignored Critic is gone after 9 waiting turns
+  (Regular 13, VIP 20). With no input at all, customers 1 (Regular) and 4 (Critic) leave; the VIP who arrived on turn 4 is still there at the end.
+
+### Edge cases (Stage 2)
+
+| # | Case (brief section) | Evidence |
+|---|---|---|
+| 1 | VIP loses 5, Critic 12, Regular 8 per waiting turn (4.2) | `CustomerTypesTest.eachTypeLosesItsOwnAmountPerWaitingTurn`, `criticLeavesFirstWhenIgnored`, `vipNeedsTwentyTurnsToLeave` |
+| 2 | VIP pays 10% less, rounded half-up to the cent; Regular and Critic pay full price (4.2, D1) | `MoneyTest.percentOffMatchesTheBriefsVipExamples`, `percentOffRoundsHalfUpToTheCent`, `OrderTest.billUsesEachCustomersOwnDiscount`, `GameControllerTest.vipPaysTheDiscountedBill` (Salad $8.10 in a real game) |
+| 3 | Critic always orders the most expensive dish (D7) | `CustomerTypesTest.criticAlwaysOrdersTheMostExpensiveDish`, `GameControllerTest.criticOrdersPastaInTheGame` |
+| 4 | Every type follows the same order and service flow (4.2) | `CustomerSubstitutionTest` (same full visit, same illegal steps refused, same leaving at 0, all through a `Customer` reference) |
+| 5 | Base run has at least one VIP and one Critic, still six arrivals (4.2) | `BaseSettingTest.vipIsSecondAndCriticIsFourth`, `idsAreOneToSixInArrivalOrder`, `GameControllerTest.baseGameSeatsVipSecondAndCriticFourth` |
+| 6 | The base setting can still reach $45 | `BaseSettingTest.anyFourOfTheFirstFiveStillReachTheRevenueTarget` |
+| 7 | Behaviour is dispatched through the customer objects, not type checks in the controller (4.2) | No `instanceof` or `getClass()` anywhere in `src/` (searched); `GameController` names no customer class |
+| 8 | Stage 1 behaviour still works (4.4) | All 74 Stage 1 tests pass unchanged apart from `new Customer(...)` becoming `new RegularCustomer(...)` |
+
+### Mutation check (do the tests catch mistakes?)
+
+The code was broken on purpose eight ways in a scratch copy; the tests failed every time:
+VIP discount 10 to 0 (4 tests fail), Critic loss 12 to 8 (4), VIP loss 5 to 8 (4), Critic picks the cheapest dish (3),
+bill ignores the discount (3), rounding truncates instead of half-up (1), VIP and Critic swapped in the base setting (3),
+arrivals ignore the turn (9).
+
+### Random-play check (50,000 games, Stage 2 base setting)
+
+Same rule checks as Stage 1, with revenue now checked against each paid customer's own dish and discount.
+**Result: 0 failures, no crashes.** Average unhappy departures per random game rose from 0.64 (Stage 1) to 1.19, because the Critic leaves sooner.
 
 ## Stage 3

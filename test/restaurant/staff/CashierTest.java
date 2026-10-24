@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import restaurant.control.GameStats;
 import restaurant.customer.Customer;
+import restaurant.customer.RegularCustomer;
 import restaurant.customer.CustomerState;
 import restaurant.menu.Menu;
 import restaurant.order.Order;
@@ -19,7 +20,7 @@ class CashierTest {
 
     /** Takes a customer all the way to READY_TO_PAY at the given table, using the real classes. */
     private Order readyToPay(int id, Table table) {
-        Customer c = new Customer(id);
+        Customer c = new RegularCustomer(id);
         table.assign(c);
         c.seat();
         Order order = Order.createOrder(c, c.chooseFood(Menu.standard()), 1);
