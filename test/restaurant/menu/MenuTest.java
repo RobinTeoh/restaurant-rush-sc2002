@@ -20,6 +20,17 @@ class MenuTest {
     }
 
     @Test
+    void comboMenuHasDishesThenCombos() {
+        List<MenuItem> items = Menu.withCombos().getItems();
+        assertEquals(6, items.size());
+        assertItem(items.get(0), "Salad", 900, 1);
+        assertItem(items.get(2), "Pasta", 1800, 2);
+        assertItem(items.get(3), "Salad + Burger", 2160, 2);
+        assertItem(items.get(4), "Salad + Pasta", 2430, 3);
+        assertItem(items.get(5), "Burger + Pasta", 2970, 3);
+    }
+
+    @Test
     void itemsCannotBeChangedFromOutside() {
         Menu menu = Menu.standard();
         assertThrows(UnsupportedOperationException.class,
