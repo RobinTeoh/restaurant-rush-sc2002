@@ -65,6 +65,18 @@ public abstract class Customer {
         }
     }
 
+    // Happy Hour recovery, only customers still waiting (table or food) gain, capped at 100
+    // the state rule stays here so the caller just says how many points
+    public final void recover(int points) {
+        if (points < 0) {
+            throw new IllegalArgumentException("points must not be negative");
+        }
+        if (!state.losesSatisfaction()) {
+            return;
+        }
+        satisfaction = Math.min(MAX_SATISFACTION, satisfaction + points);
+    }
+
     public boolean hasLeft() {
         return state == CustomerState.LEFT;
     }
