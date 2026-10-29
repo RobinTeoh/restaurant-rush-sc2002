@@ -12,7 +12,7 @@ Targets: at least 4 paid, revenue at least $45.00, average satisfaction of paid 
 * **Stage 2** (Regular, **VIP**, Regular, **Critic**, Regular, Regular): Salad, Burger, Pasta, **Pasta**, Pasta, Salad;
   bills $9.00, **$13.50** (VIP 10% off), $18.00, $18.00 (the Critic always orders the most expensive dish), $18.00, $9.00.
 
-Run files are tied to their stage: `runs/stage1-*` replay at the `stage-1` tag, `runs/stage2-*` at `stage-2`.
+Replay each stage's run files with its scenario: `sh run.sh stage1 < runs/stage1-...`, `sh run.sh stage2 < runs/stage2-...`. CI replays every stage so far.
 Stage 1 behaviour on the Stage 2 code is proven by the Stage 1 unit tests, which still pass unchanged (they use the all-Regular setting).
 
 ## Stage 1
