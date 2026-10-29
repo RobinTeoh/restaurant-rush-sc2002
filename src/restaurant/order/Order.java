@@ -2,44 +2,46 @@ package restaurant.order;
 
 import restaurant.customer.Customer;
 import restaurant.menu.MenuItem;
+import restaurant.pricing.HappyHour;
 import restaurant.pricing.Money;
 
-/**
- * One customer's order for one dish.
- * Keeps its own preparation progress and status. The status only changes through
- * the event methods below, and each one checks the current status first.
- */
 public class Order {
     private final Customer customer;
     private final MenuItem item;
     private final int turnPlaced;
+    private final int price;
     private int unitsDone;
     private OrderStatus status;
 
-    private Order(Customer customer, MenuItem item, int turnPlaced) {
+    private Order(Customer customer, MenuItem item, int turnPlaced, int price) {
         this.customer = customer;
         this.item = item;
         this.turnPlaced = turnPlaced;
+        this.price = price;
         this.unitsDone = 0;
         this.status = OrderStatus.PLACED;
     }
 
-    /** The Waiter takes an order (CONTRACT.md C -> B). */
     public static Order createOrder(Customer customer, MenuItem item, int turn) {
+        return createOrder(customer, item, turn, null);
+    }
+
+    // price is worked out here and kept, so happy hour ending later does not change it
+    public static Order createOrder(Customer customer, MenuItem item, int turn, HappyHour happyHour) {
         if (customer == null || item == null) {
             throw new IllegalArgumentException("customer and item must not be null");
         }
         if (turn < 1) {
             throw new IllegalArgumentException("turn must be at least 1");
         }
-        return new Order(customer, item, turn);
+        int price = Money.percentOff(item.getPriceCents(), customer.getDiscountPercent());
+        if (happyHour != null) {
+            price = happyHour.applyTo(price);
+        }
+        return new Order(customer, item, turn, price);
     }
 
-    /**
-     * Adds one prep unit. On the last unit the order becomes READY.
-     * Returns false and changes nothing if the order is not PLACED, so the
-     * game can ask the manager again without using up the Chef's task.
-     */
+    // returns false if the order is not waiting to be cooked, so the chef's task is not used up
     public boolean prepareOneUnit() {
         if (status != OrderStatus.PLACED) {
             return false;
@@ -55,19 +57,17 @@ public class Order {
         return status == OrderStatus.READY;
     }
 
-    /** The Waiter serves the dish: READY -> SERVED. */
     public void markServed() {
         requireStatus(OrderStatus.READY);
         status = OrderStatus.SERVED;
     }
 
-    /** The Cashier collects payment: SERVED -> PAID. */
     public void markPaid() {
         requireStatus(OrderStatus.SERVED);
         status = OrderStatus.PAID;
     }
 
-    /** The customer left before being served: PLACED or READY -> CANCELLED (DECISIONS D3). */
+    // customer left before being served (D3)
     public void cancel() {
         if (!status.canBeCancelled()) {
             throw new IllegalStateException(
@@ -76,16 +76,11 @@ public class Order {
         status = OrderStatus.CANCELLED;
     }
 
-    /**
-     * The amount to pay, in cents: the item price less the customer's own discount
-     * (VIP 10%, everyone else 0). Neither the item nor the customer type changes,
-     * so the price is fixed from the moment the order is taken.
-     */
     public int getBill() {
         if (status == OrderStatus.CANCELLED) {
-            throw new IllegalStateException("a cancelled order has no bill (DECISIONS D3)");
+            throw new IllegalStateException("a cancelled order has no bill (D3)");
         }
-        return Money.percentOff(item.getPriceCents(), customer.getDiscountPercent());
+        return price;
     }
 
     public Customer getCustomer() {
