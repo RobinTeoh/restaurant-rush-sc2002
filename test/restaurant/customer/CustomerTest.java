@@ -163,6 +163,83 @@ class CustomerTest {
         assertEquals(76, c.getRecordedSatisfaction());
     }
 
+    @Test
+    void recoverAddsPointsToAWaitingCustomer() {
+        Customer c = new RegularCustomer(1);
+        c.loseSatisfaction();
+        c.loseSatisfaction(); // 84
+        c.recover(15);
+        assertEquals(99, c.getSatisfaction());
+    }
+
+    @Test
+    void recoverIsCappedAt100() {
+        Customer c = new RegularCustomer(1);
+        c.loseSatisfaction(); // 92
+        c.recover(15);
+        assertEquals(100, c.getSatisfaction());
+    }
+
+    @Test
+    void recoverWorksForSeatedAndOrderedCustomers() {
+        Menu menu = Menu.standard();
+        Customer c = new RegularCustomer(1);
+        c.seat();
+        c.loseSatisfaction(); // 92
+        c.recover(5);
+        assertEquals(97, c.getSatisfaction());
+
+        c.chooseFood(menu);
+        c.loseSatisfaction(); // 89
+        c.recover(5);
+        assertEquals(94, c.getSatisfaction());
+    }
+
+    @Test
+    void recoverDoesNothingOnceServed() {
+        Customer c = new RegularCustomer(1);
+        c.seat();
+        c.chooseFood(Menu.standard());
+        c.loseSatisfaction(); // 92
+        c.serve();
+        c.recover(15);
+        assertEquals(92, c.getSatisfaction());
+
+        c.finishEating();
+        c.recover(15);
+        assertEquals(92, c.getSatisfaction());
+
+        c.pay();
+        c.recover(15);
+        assertEquals(92, c.getRecordedSatisfaction());
+    }
+
+    @Test
+    void recoverCannotBringBackACustomerWhoLeft() {
+        Customer c = leaveAfterThirteenTurns();
+        c.recover(15);
+        assertEquals(0, c.getSatisfaction());
+        assertTrue(c.hasLeft());
+    }
+
+    @Test
+    void recoverRejectsNegativePoints() {
+        Customer c = new RegularCustomer(1);
+        c.loseSatisfaction();
+        assertThrows(IllegalArgumentException.class, () -> c.recover(-1));
+        assertEquals(92, c.getSatisfaction());
+    }
+
+    @Test
+    void recoverAppliesTheSameToEveryCustomerType() {
+        Customer[] types = {new RegularCustomer(1), new VIPCustomer(2), new CriticCustomer(3)};
+        for (Customer c : types) {
+            c.loseSatisfaction();
+            c.recover(15);
+            assertEquals(100, c.getSatisfaction(), c.getTypeName());
+        }
+    }
+
     private static Customer leaveAfterThirteenTurns() {
         Customer c = new RegularCustomer(1);
         for (int turn = 1; turn <= 13; turn++) {

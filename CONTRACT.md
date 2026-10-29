@@ -45,13 +45,13 @@ Implemented in Stage 1 (`Customer.java`). A call made in the wrong state throws 
 | *Stage 3, proposed by B:* Create order with Happy Hour | `Order` | `createOrder(customer, item, turn, happyHour)` | `public static Order createOrder(Customer customer, MenuItem item, int turn, HappyHour happyHour)` | Price is saved when the order is taken: customer discount, then 20% if Happy Hour is on. `happyHour` can be `null`. The 3-argument one still works |
 | *Stage 3, proposed by B:* Combo menu | `Menu` | `Menu.withCombos()` | `public static Menu withCombos()` | Use for `stage3` instead of `Menu.standard()` (D8). In `Main`: `GameConfig.STAGE_3.equals(scenario) ? Menu.withCombos() : Menu.standard()` |
 | *Stage 3, proposed by B:* Happy Hour | `HappyHour` | `canActivate()`, `activate()`, `isActive()`, `getTurnsLeft()`, `endTurn()` | | One per game. Only show the option while `canActivate()`. `getTurnsLeft()` is 2, 1, then 0. Call `endTurn()` at the end of every turn |
-| *Stage 3, proposed by B:* Happy Hour recovery | `HappyHour` | `recoverWaiting(customers)` | `public void recoverWaiting(List<Customer> customers)` | Start of each Happy Hour turn (D9). Commented out until `Customer.recover` exists |
+| *Stage 3, proposed by B:* Happy Hour recovery | `HappyHour` | `recoverWaiting(customers)` | `public void recoverWaiting(List<Customer> customers)` | Start of each Happy Hour turn (D9). Calls `Customer.recover(15)` on each customer; only waiting ones gain |
 
 ## B → A (pricing calls Customer)
 | Need | Class | Agreed method | Full signature *(proposed types)* | Notes |
 |---|---|---|---|---|
 | Get discount for this customer | `Customer` | `getDiscountPercent()` | `public int getDiscountPercent()` | **Stage 2.** 0 by default, `VIPCustomer` returns 10. Read by `Order.getBill()`. Rounding per D1. |
-| *Stage 3, needed by B:* Happy Hour recovery | `Customer` | `recover(points)` | `public final void recover(int points)` | Adds points, max 100. **Robin to add** |
+| Happy Hour recovery | `Customer` | `recover(int points)` | `public final void recover(int points)` | **Stage 3, agreed.** Adds `points` (capped at 100), only while WAITING, SEATED or ORDERED; ignored for EATING, READY_TO_PAY, PAID and LEFT (a customer who left never returns). Negative points throw. B calls it with 15 (D9). |
 
 ## Gaps (status)
 | Gap | Status |
