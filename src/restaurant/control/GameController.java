@@ -16,6 +16,7 @@ import restaurant.pricing.Money;
 import restaurant.staff.Cashier;
 import restaurant.staff.Chef;
 import restaurant.staff.Waiter;
+import restaurant.staff.Host;
 
 public class GameController {
     private static final List<String> WAITER_ACTIONS =
@@ -34,6 +35,8 @@ public class GameController {
     private final Chef chef = new Chef();
     private final Cashier cashier = new Cashier();
     private final GameStats stats = new GameStats();
+    private final Host host = new Host();
+    private final boolean hostEnabled;
 
     private final List<Customer> customers = new ArrayList<>();
     private final List<Order> orders = new ArrayList<>();
@@ -42,6 +45,12 @@ public class GameController {
     private int turn;
 
     public GameController(GameView view, ArrivalSchedule schedule, Menu menu, int tableCount) {
+        this(view, schedule, menu, tableCount, false);
+    }
+
+    public GameController(GameView view, ArrivalSchedule schedule, Menu menu, int tableCount,
+                          boolean hostEnabled) {
+        this.hostEnabled = hostEnabled;
         this.view = view;
         this.schedule = schedule;
         this.menu = menu;
@@ -67,6 +76,9 @@ public class GameController {
         turn++;
         arrivals();
         view.showTurnStart(snapshot());
+        if (hostEnabled) {
+            hostPhase();
+        }
         waiterPhase();
         chefPhase();
         paymentAndEating();
@@ -81,6 +93,14 @@ public class GameController {
             queue.add(customer);
             view.showMessage("Customer " + customer.getId() + " (" + customer.getTypeName()
                 + ") arrives and joins the queue.");
+        }
+    }
+
+    // Host (Stage 3)
+    private void hostPhase() {
+        ActionResult result = host.seatFirstInQueue(queue, tables);
+        if (result.ok()) {
+            view.showMessage(result.message());
         }
     }
 
@@ -288,8 +308,19 @@ public class GameController {
                 c.getState().toString(), order));
         }
         return new TurnSnapshot(turn, GameConfig.TOTAL_TURNS, stats.getRevenueCents(), 
-                stats.averageSatisfaction(), queued, tableLines, lines, STAFF_TASKS);
+                stats.averageSatisfaction(), queued, tableLines, lines, staffTasks());
     }
+
+    private List<String> staffTasks() {
+        if (!hostEnabled) {
+            return STAFF_TASKS;
+        }
+        List<String> tasks = new ArrayList<>();
+        tasks.add("Host: automatic, seats the first queued customer if a table is free");
+        tasks.addAll(STAFF_TASKS);
+        return tasks;
+    }
+
     private GameResult currentResult() {
         return new GameResult(stats.getPaidCount(), stats.getUnhappyDepartures(),
             stats.getRevenueCents(), stats.averageSatisfaction(), turn, stats.isVictory());

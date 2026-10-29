@@ -186,4 +186,23 @@ class GameControllerTest {
         assertTrue(view.messages.contains("Customer 1 ordered Pasta $18.00 (2 units)."));
         assertEquals(76, game.getCustomers().get(0).getSatisfaction(), "critic lost 12 on two waiting turns");
     }
+        @Test
+    void hostSeatsBeforeTheWaiterSoTheWaiterCanTakeTheOrderSameTurn() {
+        ScriptedView view = new ScriptedView(
+                1, 0,   // Waiter: take order from the customer the Host just seated
+                0);     // Chef: cook it
+        GameController game = new GameController(view, new ArrivalSchedule(GameConfig.ARRIVAL_TURNS),
+                Menu.standard(), GameConfig.TABLE_COUNT, true);
+        game.playNextTurn();
+
+        assertTrue(view.messages.contains("Host seated customer 1 at table 1."));
+        assertEquals(CustomerState.ORDERED, game.getCustomers().get(0).getState());
+    }
+
+    @Test
+    void withoutTheHostNobodyIsSeatedAutomatically() {
+        GameController game = newGame(new ScriptedView());
+        game.playNextTurn();
+        assertEquals(CustomerState.WAITING, game.getCustomers().get(0).getState());
+    }
 }
