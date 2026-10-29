@@ -1,5 +1,9 @@
 package restaurant.pricing;
 
+import java.util.List;
+
+import restaurant.customer.Customer;
+
 // can only be switched on once per game, lasts the turn it starts and the next one
 public class HappyHour {
     public static final int DURATION = 2;
@@ -44,16 +48,13 @@ public class HappyHour {
         return price;
     }
 
-    // TODO: needs Customer.recover(points) from Robin, then uncomment
-    // (also import java.util.List and restaurant.customer.Customer)
-    // public void recoverWaiting(List<Customer> customers) {
-    //     if (!isActive()) {
-    //         return;
-    //     }
-    //     for (Customer c : customers) {
-    //         if (c.getState().losesSatisfaction()) {
-    //             c.recover(RECOVERY);
-    //         }
-    //     }
-    // }
+    // call at the start of each happy hour turn, recover() only helps customers still waiting
+    public void recoverWaiting(List<Customer> customers) {
+        if (!isActive()) {
+            return;
+        }
+        for (Customer c : customers) {
+            c.recover(RECOVERY);
+        }
+    }
 }
