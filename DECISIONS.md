@@ -33,9 +33,14 @@ Rules the brief leaves open, the choice we made and why.
 | D14 | VIP discount and rounding | `Order.getBill()` = `Money.percentOff(price, customer.getDiscountPercent())`, D1 half-up rounding. VIP Burger $13.50, VIP Salad $8.10. `Money.percentOff` is the only place a percentage is applied, so Stage 3's Happy Hour reuses it. | `Money`, `Order`, `MoneyTest`, `OrderTest` |
 | D15 | Which customer type arrives | Decided **outside** the controller: the arrival list holds ready-made customers of each type, and `GameController` only adds whoever `ArrivalSchedule` says arrives this turn. The controller never names a customer class and has no type checks (brief §4.2). | `ArrivalSchedule`, `GameController.arrivals`, `Main` |
 
+## Stage 3 (Ian)
+
+| # | Question | Decision | Where |
+|---|---|---|---|
+| D8 | Combo-choice rule | In stage 3 the menu has the 3 dishes then the 3 combos (Salad + Burger, Salad + Pasta, Burger + Pasta). Customers choose the same way as before (seeded pick, Critic takes the most expensive). With seed 32: Salad + Burger, Salad + Pasta, Pasta, Burger + Pasta (Critic), Burger + Pasta, Salad. Still winnable: a simple play (serve, then take orders, then seat; Chef cooks oldest order) gives 4 paid, $91.17, average 74.25. | `Menu.withCombos()`, `MenuTest` |
+
 ## Still open (decide before the stage that needs them)
 
 | # | Question | Needed by | Options / notes |
 |---|---|---|---|
-| D8 | Combo-choice rule | Stage 3 | Which customers order a combo, and which combo. Must be documented and deterministic (or seeded) |
 | D9 | Happy Hour timing | Stage 3 | Brief: switched on at turn start, lasts that turn and the next. Decide the prompt order: Happy Hour prompt → +15 recovery → display → steps 1–6? |

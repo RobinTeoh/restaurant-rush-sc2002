@@ -42,12 +42,16 @@ Implemented in Stage 1 (`Customer.java`). A call made in the wrong state throws 
 | *Proposed by B:* Whose order | `Order` | `getCustomer()` | `public Customer getCustomer()` | Also `getItem()`, `getStatus()`, `getUnitsDone()`, `getTurnPlaced()` for the display |
 | *Proposed by B:* Show money | `Money` | `Money.format(cents)` | `public static String format(int cents)` | 1800 → `"$18.00"`. The only place cents become dollar text |
 | *Proposed by B:* The menu | `Menu` | `Menu.standard()` | `public static Menu standard()` | Salad $9.00 (1 unit), Burger $15.00 (1), Pasta $18.00 (2), in that order (Robin's seed relies on it) |
+| *Stage 3, proposed by B:* Create order with Happy Hour | `Order` | `createOrder(customer, item, turn, happyHour)` | `public static Order createOrder(Customer customer, MenuItem item, int turn, HappyHour happyHour)` | Price is saved when the order is taken: customer discount, then 20% if Happy Hour is on. `happyHour` can be `null`. The 3-argument one still works |
+| *Stage 3, proposed by B:* Combo menu | `Menu` | `Menu.withCombos()` | `public static Menu withCombos()` | Use for `stage3` instead of `Menu.standard()` (D8). In `Main`: `GameConfig.STAGE_3.equals(scenario) ? Menu.withCombos() : Menu.standard()` |
+| *Stage 3, proposed by B:* Happy Hour | `HappyHour` | `canActivate()`, `activate()`, `isActive()`, `getTurnsLeft()`, `endTurn()` | | One per game. Only show the option while `canActivate()`. `getTurnsLeft()` is 2, 1, then 0. Call `endTurn()` at the end of every turn |
+| *Stage 3, proposed by B:* Happy Hour recovery | `HappyHour` | `recoverWaiting(customers)` | `public void recoverWaiting(List<Customer> customers)` | Start of each Happy Hour turn (D9). Commented out until `Customer.recover` exists |
 
 ## B → A (pricing calls Customer)
 | Need | Class | Agreed method | Full signature *(proposed types)* | Notes |
 |---|---|---|---|---|
 | Get discount for this customer | `Customer` | `getDiscountPercent()` | `public int getDiscountPercent()` | **Stage 2.** 0 by default, `VIPCustomer` returns 10. Read by `Order.getBill()`. Rounding per D1. |
-| *To confirm:* Happy Hour recovery | `Customer` | **Stage 3** | e.g. `public void recover(int points)` | +15, capped at 100 (Stage 3) |
+| *Stage 3, needed by B:* Happy Hour recovery | `Customer` | `recover(points)` | `public final void recover(int points)` | Adds points, max 100. **Robin to add** |
 
 ## Gaps (status)
 | Gap | Status |
@@ -62,3 +66,4 @@ Implemented in Stage 1 (`Customer.java`). A call made in the wrong state throws 
 | `CustomerState` enum | A | WAITING, SEATED, ORDERED, EATING, READY_TO_PAY, PAID, LEFT. `losesSatisfaction()` is true for WAITING, SEATED and ORDERED. |
 | `OrderStatus` enum | B | PLACED, READY, SERVED, PAID, CANCELLED. Progress while PLACED is `getUnitsDone()` out of `getItem().getPrepUnits()` |
 | `MenuItem`, `Menu` | B | `MenuItem`: `getName()`, `getPriceCents()`, `getPrepUnits()`, `toString()` e.g. `"Pasta $18.00 (2 units)"`. `Menu`: `getItems()` (read-only list, menu order) |
+| `ComboMeal` *(Stage 3)* | B | `extends MenuItem`. `new ComboMeal(first, second)`, e.g. "Salad + Pasta", 2430, 3 units. `getItems()` gives the two dishes |
