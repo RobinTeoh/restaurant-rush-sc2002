@@ -47,7 +47,7 @@ Implemented in Stage 1 (`Customer.java`). A call made in the wrong state throws 
 | Need | Class | Agreed method | Full signature *(proposed types)* | Notes |
 |---|---|---|---|---|
 | Get discount for this customer | `Customer` | `getDiscountPercent()` | `public int getDiscountPercent()` | **Stage 2.** 0 by default, `VIPCustomer` returns 10. Read by `Order.getBill()`. Rounding per D1. |
-| *To confirm:* Happy Hour recovery | `Customer` | **Stage 3** | e.g. `public void recover(int points)` | +15, capped at 100 (Stage 3) |
+| Happy Hour recovery | `Customer` | `recover(int points)` | `public final void recover(int points)` | **Stage 3, agreed.** Adds `points` (capped at 100), only while WAITING, SEATED or ORDERED; ignored for EATING, READY_TO_PAY, PAID and LEFT (a customer who left never returns). Negative points throw. B calls it with 15 (D9). |
 
 ## Gaps (status)
 | Gap | Status |
