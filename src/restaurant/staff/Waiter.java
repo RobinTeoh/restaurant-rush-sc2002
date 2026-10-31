@@ -11,6 +11,8 @@ import restaurant.order.Order;
 import restaurant.order.OrderStatus;
 import restaurant.place.Table;
 import restaurant.place.WaitingQueue;
+import restaurant.pricing.HappyHour;
+import restaurant.pricing.Money;
 
 public class Waiter {
     
@@ -34,6 +36,11 @@ public class Waiter {
     }
 
     public ActionResult takeOrder(Customer customer, Menu menu, int turn, List<Order> orders) {
+        return takeOrder(customer, menu, turn, orders, null);
+    }
+
+    public ActionResult takeOrder(Customer customer, Menu menu, int turn, List<Order> orders,
+                HappyHour happyHour) {
         if (customer == null) {
             return ActionResult.failure("No customer is seated.");
         }
@@ -41,10 +48,14 @@ public class Waiter {
             return ActionResult.failure("Customer " + customer.getId() + " has already ordered.");
         }
         MenuItem dish = customer.chooseFood(menu);
-        orders.add(Order.createOrder(customer, dish, turn));
-        return ActionResult.success("Customer " + customer.getId() + " ordered " + dish + ".");
+        Order order = Order.createOrder(customer, dish, turn, happyHour);
+        orders.add(order);
+        String message = "Customer " + customer.getId() + " ordered " + dish + ".";
+        if (happyHour != null && happyHour.isActive()) {
+            message += " Happy Hour price locked at " + Money.format(order.getBill()) + ".";
+        }
+        return ActionResult.success(message);
     }
-
     public ActionResult serve(Customer customer, Order order) {
         if (customer == null) {
             return ActionResult.failure("No customer is seated.");

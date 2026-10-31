@@ -17,6 +17,7 @@ import restaurant.staff.Cashier;
 import restaurant.staff.Chef;
 import restaurant.staff.Waiter;
 import restaurant.staff.Host;
+import restaurant.pricing.HappyHour;
 
 public class GameController {
     private static final List<String> WAITER_ACTIONS =
@@ -37,6 +38,7 @@ public class GameController {
     private final GameStats stats = new GameStats();
     private final Host host = new Host();
     private final boolean hostEnabled;
+    private final HappyHour happyHour;
 
     private final List<Customer> customers = new ArrayList<>();
     private final List<Order> orders = new ArrayList<>();
@@ -45,12 +47,18 @@ public class GameController {
     private int turn;
 
     public GameController(GameView view, ArrivalSchedule schedule, Menu menu, int tableCount) {
-        this(view, schedule, menu, tableCount, false);
+        this(view, schedule, menu, tableCount, false, false);
     }
 
     public GameController(GameView view, ArrivalSchedule schedule, Menu menu, int tableCount,
                           boolean hostEnabled) {
+        this(view, schedule, menu, tableCount, hostEnabled, false);
+    }
+
+    public GameController(GameView view, ArrivalSchedule schedule, Menu menu, int tableCount,
+                            boolean hostEnabled, boolean happyHourEnabled) {
         this.hostEnabled = hostEnabled;
+        this.happyHour = happyHourEnabled ? new HappyHour() : null;
         this.view = view;
         this.schedule = schedule;
         this.menu = menu;
@@ -76,6 +84,9 @@ public class GameController {
         turn++;
         arrivals();
         view.showTurnStart(snapshot());
+        if (happyHour != null) {
+            happyHourPhase();
+        }
         if (hostEnabled) {
             hostPhase();
         }
@@ -83,6 +94,9 @@ public class GameController {
         chefPhase();
         paymentAndEating();
         satisfactionUpdate();
+        if (happyHour != null) {
+            happyHour.endTurn();
+        }
         view.showResults(currentResult(), false);
     }
 
@@ -93,6 +107,27 @@ public class GameController {
             queue.add(customer);
             view.showMessage("Customer " + customer.getId() + " (" + customer.getTypeName()
                 + ") arrives and joins the queue.");
+        }
+    }
+
+    private void happyHourPhase() {
+        List<String> options = List.of("Continue", "Start Happy Hour");
+        while (true) {
+            int choice = view.choose("Start of turn: switch on Happy Hour?", options);
+            if (choice != 1) {
+                break;
+            }
+            if (happyHour.canActivate()) {
+                happyHour.activate();
+                view.showMessage("Happy Hour started: 20% off orders taken this turn and next.");
+                break;
+            }
+            view.showMessage("Happy Hour has already been used this game.");
+        }
+        if (happyHour.isActive()) {
+            happyHour.recoverWaiting(customers);
+            view.showMessage("Happy Hour: waiting customers recover " + HappyHour.RECOVERY
+                            + " satisfaction (" + happyHour.getTurnsLeft() + " turn(s) left).");  
         }
     }
 
@@ -137,13 +172,13 @@ public class GameController {
     private ActionResult takeOrderAction() {
         List<Customer> seated = seatedCustomers();
         if (seated.isEmpty()) {
-            return waiter.takeOrder(null, menu, turn, orders);
+            return waiter.takeOrder(null, menu, turn, orders, happyHour);
         }
         int pick = view.choose("Take whose order?", labels(seated));
         if (pick < 0) {
             return ActionResult.success("The Waiter waits.");
         }
-        return waiter.takeOrder(seated.get(pick), menu, turn, orders);
+        return waiter.takeOrder(seated.get(pick), menu, turn, orders, happyHour);
     }
 
     private ActionResult serveAction() {
@@ -308,7 +343,17 @@ public class GameController {
                 c.getState().toString(), order));
         }
         return new TurnSnapshot(turn, GameConfig.TOTAL_TURNS, stats.getRevenueCents(), 
-                stats.averageSatisfaction(), queued, tableLines, lines, staffTasks());
+                stats.averageSatisfaction(), queued, tableLines, lines, staffTasks(), happyHourStatus());
+    }
+
+    private String happyHourStatus() {
+        if (happyHour == null) {
+            return "";
+        }
+        if (happyHour.isActive()) {
+            return "Happy Hour: ON, " + happyHour.getTurnsLeft() + " turn(s) left";
+        }
+        return happyHour.canActivate() ? "Happy Hour: available (once per game)" : "Happy Hour: used";
     }
 
     private List<String> staffTasks() {
