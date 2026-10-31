@@ -6,7 +6,6 @@ import restaurant.boundary.ConsoleUI;
 import restaurant.control.ArrivalSchedule;
 import restaurant.control.GameConfig;
 import restaurant.control.GameController;
-import restaurant.menu.Menu;
 
 
 public class Main {
@@ -21,9 +20,10 @@ public class Main {
         GameController game = new GameController(
             new ConsoleUI(System.in, System.out),
             schedule.get(),
-            Menu.standard(),
+            GameConfig.menuFor(scenario),
             GameConfig.TABLE_COUNT,
-            GameConfig.hostEnabled(scenario));
+            GameConfig.hostEnabled(scenario),
+            GameConfig.happyHourEnabled(scenario));
         game.play();
     }
 }

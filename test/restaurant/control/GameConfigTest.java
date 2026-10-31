@@ -58,4 +58,17 @@ class GameConfigTest {
     void unknownScenarioIsRejected() {
         assertTrue(GameConfig.scheduleFor("stage9").isEmpty());
     }
+    @Test
+    void onlyStage3HasHappyHour() {
+        assertFalse(GameConfig.happyHourEnabled("stage1"));
+        assertFalse(GameConfig.happyHourEnabled("stage2"));
+        assertTrue(GameConfig.happyHourEnabled("stage3"));
+    }
+
+    @Test
+    void onlyStage3MenuHasTheCombos() {
+        assertEquals(3, GameConfig.menuFor("stage1").getItems().size());
+        assertEquals(3, GameConfig.menuFor("stage2").getItems().size());
+        assertEquals(6, GameConfig.menuFor("stage3").getItems().size());
+    }
 }

@@ -7,6 +7,7 @@ import restaurant.customer.CriticCustomer;
 import restaurant.customer.Customer;
 import restaurant.customer.RegularCustomer;
 import restaurant.customer.VIPCustomer;
+import restaurant.menu.Menu;
 
 public final class GameConfig {
     private GameConfig() { }
@@ -44,6 +45,14 @@ public final class GameConfig {
     /** The Host only works in Stage 3, so Stage 1 and 2 games play exactly as before. */
     public static boolean hostEnabled(String scenario) {
         return STAGE_3.equals(scenario);
+    }
+
+    public static boolean happyHourEnabled(String scenario) {
+        return STAGE_3.equals(scenario);
+    }
+
+    public static Menu menuFor(String scenario) {
+        return STAGE_3.equals(scenario) ? Menu.withCombos() : Menu.standard();
     }
 
 }
