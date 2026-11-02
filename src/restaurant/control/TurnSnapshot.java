@@ -11,7 +11,8 @@ public record TurnSnapshot (
         List<Integer> queuedCustomerIds,
         List<TableLine> tables,
         List<CustomerLine> customers,
-        List<String>staffTasks) {
+        List<String>staffTasks,
+        String happyHourStatus) {
     
     public record TableLine(int tableId, Integer customerId) { }
 

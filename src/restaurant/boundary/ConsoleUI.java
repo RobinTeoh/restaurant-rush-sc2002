@@ -28,6 +28,9 @@ public class ConsoleUI implements GameView {
         out.println("======== TURN " + s.turn() + " / " + s.totalTurns() + " ========");
         out.println("Revenue: " + formatMoney(s.revenueCents()) + "  Average Satisfaction: "
             + formatAverage(s.averageSatisfaction()));
+        if (!s.happyHourStatus().isEmpty()) {
+            out.println(s.happyHourStatus());
+        }
         out.println("Waiting queue: " + (s.queuedCustomerIds().isEmpty() ? "empty" : s.queuedCustomerIds()));
         for (TurnSnapshot.TableLine t : s.tables()) {
             out.println("Table " + t.tableId() + ": "

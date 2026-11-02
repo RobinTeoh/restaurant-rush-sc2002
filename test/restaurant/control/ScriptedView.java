@@ -15,6 +15,7 @@ class ScriptedView implements GameView {
     private final Deque<Integer> answers = new ArrayDeque<>();
     final List<String> messages = new ArrayList<>();
     final List<GameResult> results = new ArrayList<>();
+    final List<TurnSnapshot> snapshots = new ArrayList<>();
     int turnStarts;
 
     ScriptedView(int... answers) {
@@ -26,6 +27,7 @@ class ScriptedView implements GameView {
     @Override
     public void showTurnStart(TurnSnapshot snapshot) {
         turnStarts++;
+        snapshots.add(snapshot);
     }
 
     @Override
