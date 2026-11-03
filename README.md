@@ -15,6 +15,7 @@ SC2002 group assignment: a turn-based restaurant management game in Java (comman
 | [CONTRACT.md](CONTRACT.md) | Agreed method signatures between roles |
 | [docs/test-notes.md](docs/test-notes.md) | Reproducible runs and edge-case checks |
 | [docs/design-log.md](docs/design-log.md) | Design choices, alternatives rejected, and why |
+| [docs/design-principles.md](docs/design-principles.md) | Where SOLID genuinely shows in the code (and where it does not) |
 
 ## Requirements
 - JDK 17 or newer (compiled with `--release 17`)
