@@ -41,7 +41,7 @@ Full wording and alternatives: [DECISIONS.md](../DECISIONS.md) (rules) and [desi
 | D9 (closed) | Happy Hour timing: arrivals, then the start-of-turn display, then the Happy Hour prompt (once per game), then +15 recovery, then Host, Waiter, Chef, payment and satisfaction. `endTurn()` runs at turn end. | Lasts the starting turn and the next. The screen shows "turns left" after it is switched on. Only WAITING, SEATED and ORDERED customers recover (capped at 100). |
 | log | `HappyHour` is its own class; `Customer.recover(points)` keeps the state rule in the customer. | The controller only switches it on and calls `endTurn()`. Pricing and recovery rules live in one place. |
 
-**Outcome:** the Stage 3 base run is still winnable (146 tests; bot wins 87.9% of 100,000 random games). Happy Hour is the manager's new timing choice: switching it on when many customers wait both saves them from leaving and discounts orders.
+**Outcome:** the Stage 3 base run is still winnable (151 tests, including `Stage3BaseSettingTest`). Happy Hour is the manager's new timing choice: switching it on when many customers wait both saves them from leaving and discounts orders.
 
 ## Open items for the team
 * Confirm the D9 order with Caleb: the start-of-turn display is drawn before the Happy Hour prompt, so the +15 appears in the messages, not in that first display.

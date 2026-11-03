@@ -153,9 +153,9 @@ Customers 1 to 6 order (seed 32, D8): Salad + Burger ($21.60), Salad + Pasta ($2
 | 6 | VIP discount first, then Happy Hour: VIP Burger = $10.80; price locked at order time (4.3) | `OrderTest.happyHourAfterVipDiscount`, `priceLockedAfterHappyHourEnds`, `vipComboInHappyHour`; `GameControllerTest.vipBurgerOrderedDuringHappyHourIsLockedAt1080` |
 | 7 | +15 recovery for waiting customers only, capped at 100; none for served, eating or ready customers (4.3) | `HappyHourTest.waitingCustomersRecover15`, `recoveryCappedAt100`, `noRecoveryWhenOff`; `CustomerTest` recover cases |
 | 8 | Stage 1 and 2 behaviour is unchanged by Stage 3 (Happy Hour is never offered in Stages 1 and 2: `GameControllerTest.stage1And2GamesNeverAskAboutHappyHour`) | The 102 Stage 2 tests pass unchanged; CI replays the Stage 1, 2 and 3 run files |
-| 9 | The base run is still winnable | `runs/stage3-victory.txt` (4 paid, $87.57); Ian's check in D8: a simple play gives 4 paid, $91.17; `GameConfigTest` pins the Stage 3 setting |
+| 9 | The base run is still winnable; the six orders are fixed (4 of 6 contain Pasta, so D5's "at most 2 Pasta" is a Stage 1 aim only, see DECISIONS) | `Stage3BaseSettingTest` (orders, any 4 of the first 5 reach $45, replays `runs/stage3-victory.txt` to a victory and `runs/stage3-defeat.txt` to a defeat); Ian's check in D8: a simple play gives 4 paid, $91.17 |
 
-**Result:** 146 tests pass (102 from Stage 2 + 44 new).
+**Result:** 151 tests pass (102 from Stage 2 + 49 new).
 
 ### Known behaviours to document (not bugs)
 

@@ -120,7 +120,7 @@ Compare: https://github.com/RobinTeoh/restaurant-rush-sc2002/compare/stage-2...s
 | `run.sh`, `run.bat` | Accept the scenario argument. | Replay `stage3` run files. |
 | `CONTRACT.md`, `DECISIONS.md`, `docs/` | Stage 3 contract, D8 and D9, design-log rows. | Record the decisions. |
 | `.github/workflows/ci.yml` | `STAGE` set to 3; CI replays the run files of every stage so far. | Proves Stage 1 and 2 behaviour still works. |
-| Existing tests | Only added to (new tests in `CustomerTest`, `OrderTest`, `MenuTest`, `GameControllerTest`). | 146 tests pass; the 102 from Stage 2 are unchanged. |
+| Existing tests | Only added to (new tests in `CustomerTest`, `OrderTest`, `MenuTest`, `GameControllerTest`). | 151 tests pass; the 102 from Stage 2 are unchanged. |
 
 **Deleted:** nothing.
 
