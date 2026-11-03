@@ -1,7 +1,7 @@
 name: ci
 on: [push, pull_request]
 env:
-  STAGE: "2"   # update after each stage tag
+  STAGE: "3"   # update after each stage tag
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -11,12 +11,14 @@ jobs:
         with: { distribution: temurin, java-version: "17" }
       - run: sh build.sh
       - run: sh test.sh
-      - name: Replay run files for current stage
+      - name: Replay run files for every stage so far
         run: |
-          for f in runs/stage${STAGE}-victory*.txt runs/stage${STAGE}-defeat*.txt; do
-            [ -e "$f" ] || continue
-            case "$f" in *victory*) want=VICTORY ;; *) want=DEFEAT ;; esac
-            out=$(sh run.sh < "$f")
-            echo "$out" | grep -q "$want" || { echo "FAILED: $f (expected $want)"; exit 1; }
-            echo "OK: $f -> $want"
+          for s in $(seq 1 "$STAGE"); do
+            for f in runs/stage${s}-victory*.txt runs/stage${s}-defeat*.txt; do
+              [ -e "$f" ] || continue
+              case "$f" in *victory*) want=VICTORY ;; *) want=DEFEAT ;; esac
+              out=$(sh run.sh "stage${s}" < "$f")
+              echo "$out" | grep -q "$want" || { echo "FAILED: $f (expected $want)"; exit 1; }
+              echo "OK: $f -> $want"
+            done
           done

@@ -36,6 +36,10 @@ This feeds the report's trade-offs, alternative design and stage-evolution secti
 | 2026-10-29 | `HappyHour` is its own class that counts down its turns and can only be activated once. | Keeping a flag and turn number in `GameController` | Keeps all the Happy Hour rules in one place, so the controller only switches it on and calls `endTurn()`. | Ian (B) |
 | 2026-10-29 | +15 recovery is for customers in WAITING, SEATED or ORDERED, using `CustomerState.losesSatisfaction()`. Uses `Customer.recover()` from Robin. | Setting satisfaction directly from `HappyHour` | These are the customers "waiting for a table or food". The customer still controls its own satisfaction. | Ian (B) |
 | 2026-10-29 | Combo rule (D8): stage 3 menu has the dishes and the 3 combos, customers pick as before. | Only VIPs order combos; a fixed customer orders a combo | Customers really choose, and no change was needed in the customer classes. Combos earn more but take longer to cook, so the manager has more to think about. | Ian (B) |
+| 2026-11-03 | **Combo rule stays D8** (seeded pick over dishes and combos). Robin's "every 2nd customer orders a combo" branch was dropped. | A fixed pattern (every 2nd customer) written into `Customer` | The brief only asks for a documented rule. D8 changes no customer class (Open/Closed: `ComboMeal` plugs into `Menu`), combos still appear for 4 of 6 customers, and the base run stays winnable. The pattern rule would have edited `Customer` and needed a Critic exception (brief 4.4 asks us to justify earlier-class edits). | Robin (A) |
+| 2026-11-03 | **No new interface for Host and Waiter seating.** | A `Seater` interface both implement; splitting `GameView` into display and input | Only two implementers with different signatures (the Waiter seats a chosen customer at a chosen table, the Host seats the first queued customer), and nothing in the controller needs to treat them alike. The brief says not to create interfaces just to satisfy a checklist. Interface Segregation is reported as weakly present (`GameView` has only four methods, all used by every implementer). | Robin (A) |
+| 2026-11-04 | **The default scenario is now Stage 3** (`GameConfig.DEFAULT_SCENARIO`, `run.sh`, `run.bat`). `sh run.sh stage1` and `stage2` still play the earlier settings. | Keep Stage 2 as the default and tell graders to type `stage3` | A grader who checks out the `stage-3` tag and types plain `run` should get the Stage 3 game (brief 4.3: Stage 3 is independently playable). Each tag defaults to its own stage. A one-constant change, no test depends on it. | Robin (A) |
+| 2026-11-03 | **Happy Hour order inside a turn (D9):** arrivals, start-of-turn display, Happy Hour prompt, +15 recovery, Host, Waiter, Chef, payment, satisfaction, `endTurn()`. | Prompt before the display so the first screen already shows the +15 | Keeps the display step identical in all stages; the +15 and "turns left" appear right after the prompt. Documented as a known behaviour in `test-notes.md`. | Robin (A) |
 
 ## Open questions for the team (Customer)
 
@@ -99,3 +103,13 @@ stateDiagram-v2
 ```
 
 Open points: who triggers EATING → READY_TO_PAY (the turn loop, step 4), and whether the customer counts the eating turn itself or is told the turn (see Step 3).
+
+## Stage 3 whole-system class diagram (snapshot for the `stage-3` tag)
+
+Editable source: [uml/stage-3-class-diagram.drawio](uml/stage-3-class-diagram.drawio) (open in draw.io). PNG export: [uml/stage-3.png](uml/stage-3.png), rendered with the draw.io viewer. Built from the Stage 2 diagram plus the Stage 3 code.
+
+New: `Host` (control), `HappyHour` (entity: it keeps its own state, `used` and `turnsLeft`), `ComboMeal` (entity, extends `MenuItem`). `GameController` owns a `Host` and an optional `HappyHour`. `Order` now stores its `price` and depends on `HappyHour` when it is created. Changed operations: `Customer.recover`, `Menu.withCombos`, `Order.createOrder(..., happyHour)`, `Waiter.takeOrder(..., happyHour)`, `GameConfig` scenario methods, and the longer `GameController` constructor.
+
+Left out on purpose (as in Stage 1 and 2): the records `TurnSnapshot`, `GameResult`, `ActionResult` and private helpers. Not drawn: the dependencies of `Host` on `WaitingQueue`, `Table` and `Customer` (the Waiter's are not drawn either).
+
+Redrawn on 2026-11-03 to follow the lecture notes (Chapter 6, 2026S1): only the BCE stereotypes `<<boundary>>`, `<<control>>`, `<<entity>>` plus `<<interface>>` and `<<enumeration>>` (the lecture has no `<<util>>`, so `Money` and `GameStats` are entities and `GameConfig` is control); every stored object field is an association line with role name and multiplicity; filled diamond for composition and hollow diamond for aggregation (`ComboMeal` is given two existing `MenuItem`s); dependencies are dashed open arrows; all lines are horizontal or vertical.

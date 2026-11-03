@@ -38,9 +38,10 @@ Rules the brief leaves open, the choice we made and why.
 | # | Question | Decision | Where |
 |---|---|---|---|
 | D8 | Combo-choice rule | In stage 3 the menu has the 3 dishes then the 3 combos (Salad + Burger, Salad + Pasta, Burger + Pasta). Customers choose the same way as before (seeded pick, Critic takes the most expensive). With seed 32: Salad + Burger, Salad + Pasta, Pasta, Burger + Pasta (Critic), Burger + Pasta, Salad. Still winnable: a simple play (serve, then take orders, then seat; Chef cooks oldest order) gives 4 paid, $91.17, average 74.25. | `Menu.withCombos()`, `MenuTest` |
+| D5 note 2 | Pasta count in Stage 3 | With the combos menu, 4 of the 6 base-run orders contain Pasta (customers 2, 3, 4, 5). The "at most 2 Pasta" aim of D5 only applies to the Stage 1 setting. Accepted: the run is still winnable (best play 4 paid, victory run $87.57). | `Stage3BaseSettingTest` |
 
 ## Still open (decide before the stage that needs them)
 
 | # | Question | Needed by | Options / notes |
 |---|---|---|---|
-| D9 | Happy Hour timing | Stage 3 | Brief: switched on at turn start, lasts that turn and the next. Decide the prompt order: Happy Hour prompt → +15 recovery → display → steps 1–6? |
+| D9 | Happy Hour timing | Stage 3 | **Closed (implemented):** arrivals → start-of-turn display → Happy Hour prompt (once per game) → +15 recovery → Host → Waiter → Chef → payment → satisfaction; `endTurn()` at turn end. Team to confirm with Caleb. See `docs/decision-summary.md`. |

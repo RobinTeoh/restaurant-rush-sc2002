@@ -15,6 +15,7 @@ SC2002 group assignment: a turn-based restaurant management game in Java (comman
 | [CONTRACT.md](CONTRACT.md) | Agreed method signatures between roles |
 | [docs/test-notes.md](docs/test-notes.md) | Reproducible runs and edge-case checks |
 | [docs/design-log.md](docs/design-log.md) | Design choices, alternatives rejected, and why |
+| [docs/design-principles.md](docs/design-principles.md) | Where SOLID genuinely shows in the code (and where it does not) |
 
 ## Requirements
 - JDK 17 or newer (compiled with `--release 17`)
@@ -26,7 +27,7 @@ SC2002 group assignment: a turn-based restaurant management game in Java (comman
 | Build | `build.bat` | `sh build.sh` |
 | Run | `run.bat` | `sh run.sh` |
 | Test | `test.bat` | `sh test.sh` |
-| Replay a run | `run.bat < runs\stage1-victory.txt` | `sh run.sh < runs/stage1-victory.txt` |
+| Replay a run | `run.bat stage1 < runs\stage1-victory.txt` | `sh run.sh stage1 < runs/stage1-victory.txt` |
 
 Build before running (`run` uses the last build). Type a number and press Enter to answer each prompt.
 
@@ -42,6 +43,8 @@ The customers order Salad, Burger, Pasta, Pasta (the Critic), Pasta, Salad. Deta
 
 | Run file (replay at tag) | Result |
 |---|---|
+| `runs/stage3-victory.txt` (`stage-3`) | VICTORY: 4 paid, $87.57, average 80.0 (Happy Hour switched on in turn 7) |
+| `runs/stage3-defeat.txt` (`stage-3`) | DEFEAT: the Chef is never given an order, so nobody is served |
 | `runs/stage2-victory.txt` (`stage-2`) | VICTORY: 4 paid, $58.50, average 75.5 |
 | `runs/stage2-victory-5paid.txt` (`stage-2`) | VICTORY: 5 paid, $76.50, average 73.2 (the most that can pay) |
 | `runs/stage2-defeat.txt` (`stage-2`) | DEFEAT: the Chef is never given an order, so nobody is served |
@@ -50,7 +53,7 @@ The customers order Salad, Burger, Pasta, Pasta (the Critic), Pasta, Salad. Deta
 | `runs/stage1-defeat.txt` (`stage-1`) | DEFEAT |
 | `runs/stage1-edge-invalid-input.txt` (`stage-1`) | Invalid inputs are explained and asked again, then the input ends and the game plays on |
 
-A run file belongs to its stage, because later stages change the customers. To replay a Stage 1 run: `git checkout stage-1`, build, then run.
+A run file belongs to its stage, because later stages change the customers and the menu. To replay one: `git checkout stage-N`, build, then `sh run.sh stageN < runs/stageN-...txt` (`run.bat stageN < ...` on Windows). Without the `stageN` argument the game starts the latest stage (Stage 3 at the `stage-3` tag; each tag defaults to its own stage).
 
 What each run does, the edge cases and the test evidence: [docs/test-notes.md](docs/test-notes.md).
 
@@ -93,7 +96,34 @@ Compare: https://github.com/RobinTeoh/restaurant-rush-sc2002/compare/stage-1...s
 
 ### Stage 2 → Stage 3
 Compare: https://github.com/RobinTeoh/restaurant-rush-sc2002/compare/stage-2...stage-3
-<!-- new files; changed or deleted files with reasons -->
+
+**New files**
+
+| File | Why |
+|---|---|
+| `staff/Host.java` | Seats the first queued customer at a free table, at most once per turn, automatically before the Waiter (D4, brief 4.3) |
+| `menu/ComboMeal.java` | A `MenuItem` made of two existing items: units added up, price 90% of the pair rounded half-up (brief 4.3) |
+| `pricing/HappyHour.java` | Once per game, lasts two turns, 20% off, +15 recovery for waiting customers, counts its own turns |
+| `test/.../HostTest`, `ComboMealTest`, `HappyHourTest`, `GameConfigTest` | Host rules, combo units and price, Happy Hour rules, the Stage 3 setting |
+| `runs/stage3-victory.txt`, `runs/stage3-defeat.txt` | Reproducible Stage 3 victory and defeat runs |
+
+**Changed files, and why**
+
+| File | Change | Why |
+|---|---|---|
+| `menu/Menu.java` | Added `withCombos()`: the three dishes, then Salad + Burger, Salad + Pasta, Burger + Pasta. | The combo-choice rule (D8) needs the combos on the menu. Customers pick from the menu as before, so no customer class changed for it. |
+| `order/Order.java` | `createOrder(customer, item, turn, happyHour)` works out the bill when the order is taken and stores it: VIP discount first, then Happy Hour. The old `createOrder` still works. | Happy Hour may be over by the time the customer pays, so the price must be locked at order time (brief 4.3). Stages 1 and 2 still call the old method. |
+| `customer/Customer.java` | Added `recover(points)`: only WAITING, SEATED and ORDERED customers gain, capped at 100. | Keeps the state rule inside the customer. `HappyHour` only says how many points. |
+| `staff/Waiter.java` | `takeOrder` passes the Happy Hour to `Order.createOrder`. | So orders taken during Happy Hour get the lower price. |
+| `control/GameController.java` | Two switches (`hostEnabled`, a `HappyHour` that may be null). Each turn: Happy Hour prompt and +15 recovery, then the Host, then the Waiter; `endTurn()` at turn end. The screen shows Happy Hour status and turns left. | Wires the new role and policy into the six steps without touching Stage 1 and 2 rules. With both switched off the turn is the same as Stage 2. |
+| `control/GameConfig.java`, `app/Main.java` | Scenario `stage1`, `stage2` or `stage3` picks the arrivals, menu, Host and Happy Hour. | One place for each stage's setting; the default is now Stage 3, so a plain `run` plays the latest stage. |
+| `control/TurnSnapshot.java`, `boundary/ConsoleUI.java` | Carry and print the Happy Hour line. | Display only. |
+| `run.sh`, `run.bat` | Accept the scenario argument. | Replay `stage3` run files. |
+| `CONTRACT.md`, `DECISIONS.md`, `docs/` | Stage 3 contract, D8 and D9, design-log rows. | Record the decisions. |
+| `.github/workflows/ci.yml` | `STAGE` set to 3; CI replays the run files of every stage so far. | Proves Stage 1 and 2 behaviour still works. |
+| Existing tests | Only added to (new tests in `CustomerTest`, `OrderTest`, `MenuTest`, `GameControllerTest`). | 151 tests pass; the 102 from Stage 2 are unchanged. |
+
+**Deleted:** nothing.
 
 ## Video
 <!-- link + timestamps for segments 1-7 -->
