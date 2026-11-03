@@ -106,7 +106,7 @@ Open points: who triggers EATING → READY_TO_PAY (the turn loop, step 4), and w
 
 ## Stage 3 whole-system class diagram (snapshot for the `stage-3` tag)
 
-Editable source: [uml/stage-3-class-diagram.drawio](uml/stage-3-class-diagram.drawio) (open in draw.io; export `docs/uml/stage-3.png` before tagging). Built from the Stage 2 diagram plus the Stage 3 code.
+Editable source: [uml/stage-3-class-diagram.drawio](uml/stage-3-class-diagram.drawio) (open in draw.io). PNG export: [uml/stage-3.png](uml/stage-3.png), rendered with the draw.io viewer. Built from the Stage 2 diagram plus the Stage 3 code.
 
 New: `Host` (control), `HappyHour` (entity: it keeps its own state, `used` and `turnsLeft`), `ComboMeal` (entity, extends `MenuItem`). `GameController` owns a `Host` and an optional `HappyHour`. `Order` now stores its `price` and depends on `HappyHour` when it is created. Changed operations: `Customer.recover`, `Menu.withCombos`, `Order.createOrder(..., happyHour)`, `Waiter.takeOrder(..., happyHour)`, `GameConfig` scenario methods, and the longer `GameController` constructor.
 
