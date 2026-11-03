@@ -43,4 +43,4 @@ Rules the brief leaves open, the choice we made and why.
 
 | # | Question | Needed by | Options / notes |
 |---|---|---|---|
-| D9 | Happy Hour timing | Stage 3 | Brief: switched on at turn start, lasts that turn and the next. Decide the prompt order: Happy Hour prompt → +15 recovery → display → steps 1–6? |
+| D9 | Happy Hour timing | Stage 3 | **Closed (implemented):** arrivals → start-of-turn display → Happy Hour prompt (once per game) → +15 recovery → Host → Waiter → Chef → payment → satisfaction; `endTurn()` at turn end. Team to confirm with Caleb. See `docs/decision-summary.md`. |

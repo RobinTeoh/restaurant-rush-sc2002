@@ -29,7 +29,7 @@ public final class GameConfig {
     public static final String STAGE_1 = "stage1";
     public static final String STAGE_2 = "stage2";
     public static final String STAGE_3 = "stage3";
-    public static final String DEFAULT_SCENARIO = STAGE_2;
+    public static final String DEFAULT_SCENARIO = STAGE_3;
 
 
     public static Optional<ArrivalSchedule> scheduleFor(String scenario) {

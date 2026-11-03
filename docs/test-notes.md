@@ -124,3 +124,40 @@ Same rule checks as Stage 1, with revenue now checked against each paid customer
 **Result: 0 failures, no crashes.** Average unhappy departures per random game rose from 0.64 (Stage 1) to 1.19, because the Critic leaves sooner.
 
 ## Stage 3
+
+Base setting: the Stage 2 customers (Regular, VIP, Regular, Critic, Regular, Regular) on the combo menu. Replay with `sh run.sh stage3 < runs/stage3-...txt`.
+Customers 1 to 6 order (seed 32, D8): Salad + Burger ($21.60), Salad + Pasta ($24.30), Pasta, Burger + Pasta (the Critic, $29.70), Burger + Pasta ($29.70), Salad.
+
+### Reproducible runs
+
+| Run file | What the manager does | Result | Paid | Revenue | Avg satisfaction | Unhappy departures |
+|---|---|---|---|---|---|---|
+| `runs/stage3-victory.txt` | Same Waiter priority as Stage 1 (serve, then take orders, then seat); the Host seats automatically; Happy Hour is switched on at the start of turn 7, so customer 3's Pasta is locked at $14.40. | **VICTORY** | 4 | $87.57 | 80.0 | 0 |
+| `runs/stage3-defeat.txt` | The Chef is never given an order. The Host seats customers 1 and 2, but nothing is cooked. | **DEFEAT** | 0 | $0.00 | N/A | 2 |
+
+### How the player's choices change the result (for the report)
+
+* **Happy Hour timing is the new choice.** It can be used once, so the manager picks the turn. Switching it on while customers are waiting or seated saves satisfaction (+15 on each of two turns) and discounts every order taken in those two turns; switching it on when nobody waits wastes it.
+* **The Host frees the Waiter.** The Host seats the first queued customer by itself, so the Waiter can spend its one task on orders and serving instead of seating.
+* **Combos earn more but cook longer.** A combo is 2 or 3 preparation units, so the Chef's order of work matters more than with single dishes.
+
+### Edge cases (Stage 3)
+
+| # | Case (brief section) | Evidence |
+|---|---|---|
+| 1 | Host seats at most one customer per turn; nobody queuing or no free table: nothing happens (4.3) | `HostTest.seatsTheFirstQueuedCustomerAtTheFirstFreeTable`, `nobodyQueuingMeansNothingHappens`, `noFreeTableMeansNothingHappens` |
+| 2 | The Waiter can still seat while the Host is on (4.3) | `GameControllerTest.waiterCanStillSeatACustomerAfterTheHost`, `hostSeatsAtMostOneCustomerPerTurn`, `hostSeatsBeforeTheWaiterSoTheWaiterCanTakeTheOrderSameTurn`, `withoutTheHostNobodyIsSeatedAutomatically` |
+| 3 | Combo units are the sum; price is 90% of the pair, rounded to the cent: Salad + Pasta = $24.30, 3 units (4.3) | `ComboMealTest.saladAndPasta`, `otherCombos`, `keepsBothItems`; `chefCooksComboLikeNormalDish` |
+| 4 | Happy Hour: once per game, lasts this turn and the next, shows turns left (4.3) | `HappyHourTest.lastsTwoTurns`, `onlyOncePerGame`, `offAtStart`; `GameControllerTest.happyHourOnlyOncePerGameLastsTwoTurnsAndRecoversWaitingCustomers`, `remainingHappyHourTurnsAreShownAtTurnStart` |
+| 5 | 20% off for orders taken while active; no discount when off (4.3) | `HappyHourTest.twentyPercentOff`, `noDiscountWhenOff` |
+| 6 | VIP discount first, then Happy Hour: VIP Burger = $10.80; price locked at order time (4.3) | `OrderTest.happyHourAfterVipDiscount`, `priceLockedAfterHappyHourEnds`, `vipComboInHappyHour`; `GameControllerTest.vipBurgerOrderedDuringHappyHourIsLockedAt1080` |
+| 7 | +15 recovery for waiting customers only, capped at 100; none for served, eating or ready customers (4.3) | `HappyHourTest.waitingCustomersRecover15`, `recoveryCappedAt100`, `noRecoveryWhenOff`; `CustomerTest` recover cases |
+| 8 | Stage 1 and 2 behaviour is unchanged by Stage 3 (Happy Hour is never offered in Stages 1 and 2: `GameControllerTest.stage1And2GamesNeverAskAboutHappyHour`) | The 102 Stage 2 tests pass unchanged; CI replays the Stage 1, 2 and 3 run files |
+| 9 | The base run is still winnable | `runs/stage3-victory.txt` (4 paid, $87.57); Ian's check in D8: a simple play gives 4 paid, $91.17; `GameConfigTest` pins the Stage 3 setting |
+
+**Result:** 146 tests pass (102 from Stage 2 + 44 new).
+
+### Known behaviours to document (not bugs)
+
+* Order in a turn: arrivals, start-of-turn display, Happy Hour prompt, +15 recovery, Host, Waiter, Chef, payment, satisfaction, `endTurn()`. The first display is drawn before the prompt, so the +15 shows in the messages that follow.
+* The Host is automatic and always seats the first queued customer; the manager cannot choose who.
