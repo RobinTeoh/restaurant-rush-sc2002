@@ -13,7 +13,7 @@
   body { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; color: var(--ink); font-size: 10.2pt; line-height: 1.45; margin: 0; background: #fff; }
   h1 { font-size: 26pt; margin: 0 0 4mm; letter-spacing: -0.5px; }
   h2 { font-size: 15pt; margin: 0 0 3mm; padding-bottom: 1.5mm; border-bottom: 2px solid var(--ink); }
-  h3 { font-size: 11.5pt; margin: 5mm 0 2mm; }
+  h3 { font-size: 11.5pt; margin: 5mm 0 2mm; break-after: avoid; }
   p { margin: 0 0 2.5mm; }
   section { page-break-before: always; }
   section.cover { page-break-before: auto; }
@@ -27,12 +27,14 @@
   li { margin-bottom: 0.8mm; }
   .muted { color: var(--muted); }
   .tag { display: inline-block; font-weight: 700; font-size: 8.5pt; padding: 0.3mm 2mm; border-radius: 10px; color: #fff; }
+  .td { background: #7a4fc2; }
   .ta { background: var(--a); } .tb { background: var(--b); } .tc { background: var(--c); } .tall { background: var(--ink); }
   .box { border: 1px solid var(--line); border-left: 4px solid var(--ink); background: var(--soft); padding: 2.5mm 3.5mm; margin: 2mm 0 4mm; page-break-inside: avoid; }
   .box.warn { border-left-color: var(--accent); }
   .box.add { border-left-color: var(--b); }
   .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 3mm; margin: 2mm 0 4mm; }
   .card { border: 1px solid var(--line); border-top: 4px solid var(--ink); padding: 2.5mm 3mm; page-break-inside: avoid; }
+  .card.d { border-top-color: #7a4fc2; }
   .card.a { border-top-color: var(--a); } .card.b { border-top-color: var(--b); } .card.c { border-top-color: var(--c); }
   .card h4 { margin: 0 0 1.5mm; font-size: 10.5pt; }
   .card ul { font-size: 9pt; }
@@ -50,14 +52,15 @@
 <section class="cover">
   <p class="muted big">SC2002 · Group Assignment</p>
   <h1>Restaurant Rush<br>Team Manual</h1>
-  <p class="big">Everything we agreed, on a few pages: who does what, when, the game rules, and how marks are earned.</p>
+  <p class="big">Everything we agreed, on a few pages: who does what, when, and the game rules.</p>
 
   <table class="cover-meta">
     <tr><td><span class="tag ta">A</span></td><td><b>Robin</b>: Customers</td></tr>
     <tr><td><span class="tag tb">B</span></td><td><b>Ian</b>: Kitchen, Menu &amp; Pricing (incl. all of Happy Hour)</td></tr>
     <tr><td><span class="tag tc">C</span></td><td><b>Caleb</b>: Game loop, Staff &amp; CLI</td></tr>
+    <tr><td><span class="tag td">D</span></td><td><b>Takshak</b>: Class diagrams (one per stage)</td></tr>
+    <tr><td><span class="tag td">E</span></td><td><b>Sibghat</b>: Sequence diagram</td></tr>
     <tr><td>Repo</td><td><code>github.com/RobinTeoh/restaurant-rush-sc2002</code></td></tr>
-    <tr><td>Version</td><td>12 Oct 2026, after the first meeting</td></tr>
   </table>
 
   <div class="box">
@@ -75,8 +78,7 @@
     <li>Week-by-week checklists</li>
     <li>Our decisions</li>
     <li>Rules cheat sheet</li>
-    <li>How marks are earned</li>
-    <li>Git routine and tag steps</li>
+        <li>Git routine and tag steps</li>
     <li>Report, video and submission</li>
   </ol>
 </section>
@@ -124,7 +126,7 @@
 <!-- ============ 2. ROLES ============ -->
 <section>
   <h2>2 · Team and roles</h2>
-  <p><b>Each person only edits their own folders.</b> If you need a change in someone else's folder, ask them in the group chat or open an issue.</p>
+  <p>Five people: three own the code (A, B, C), two own the diagrams (Takshak, Sibghat) and work together on them. <b>Each person only edits their own folders.</b> If you need a change in someone else's folder, ask them in the group chat or open an issue.</p>
 
   <div class="grid3">
     <div class="card a">
@@ -133,9 +135,9 @@
         <li><b>Folder:</b> <code>customer/</code></li>
         <li><b>Stage 1:</b> Customer, satisfaction loss and leaving, food choice, discount (Regular 0%)</li>
         <li><b>Stage 2:</b> VIPCustomer, CriticCustomer, mixed arrival list, Stage 2 runs</li>
-        <li><b>Diagram:</b> class diagram</li>
-        <li><b>Report:</b> trade-offs and alternative design</li>
-        <li><b>Video:</b> 4, 6, 7 (diagrams)</li>
+        <li><b>Diagram:</b> supports Takshak with the Customer classes</li>
+        <li><b>Report:</b> evidence and process, framing and editing, <code>customer/</code> rows</li>
+        <li><b>Video:</b> 4, 6</li>
       </ul>
     </div>
     <div class="card b">
@@ -144,7 +146,8 @@
         <li><b>Folders:</b> <code>menu/</code> <code>order/</code> <code>pricing/</code> <code>staff/Chef</code></li>
         <li><b>Stage 1:</b> MenuItem, Menu, Order, OrderStatus, Chef, bill in cents</li>
         <li><b>Stage 3:</b> ComboMeal, <b>all</b> of Happy Hour</li>
-        <li><b>Report:</b> SOLID principles</li>
+        <li><b>Diagram:</b> answers Order/Pricing questions for Sibghat</li>
+        <li><b>Report:</b> SOLID evidence for <code>menu/</code> <code>order/</code> <code>pricing/</code></li>
         <li><b>Video:</b> 3, 5 (combo, Happy Hour)</li>
       </ul>
     </div>
@@ -154,12 +157,35 @@
         <li><b>Folders:</b> <code>app/</code> <code>boundary/</code> <code>control/</code> <code>place/</code> <code>staff/Waiter</code> <code>staff/Cashier</code> <code>staff/Host</code></li>
         <li><b>Stage 1:</b> Table, WaitingQueue, turn loop, Waiter, Cashier, displays, input, victory check</li>
         <li><b>Stage 3:</b> Host, Happy Hour switch, README transitions</li>
-        <li><b>Diagram:</b> sequence diagram</li>
+        <li><b>Diagram:</b> confirms the turn order for Sibghat's sequence diagram</li>
         <li><b>Report:</b> player choices; functional evidence</li>
         <li><b>Video:</b> 1, 2, 5 (Host), 7 (tags)</li>
       </ul>
     </div>
   </div>
+
+  <h3>Diagram owners (work together)</h3>
+  <div class="grid3" style="grid-template-columns: 1fr 1fr;">
+    <div class="card d">
+      <h4><span class="tag td">D</span> Takshak · Class diagrams</h4>
+      <ul>
+        <li><b>Owns:</b> one class diagram per stage (<code>docs/uml/</code>), including the Stage 1 redraw and the <code>stage-N.png</code> snapshots</li>
+        <li><b>Source:</b> the real code at each tag; starts from Robin's Stage 2 and 3 drafts</li>
+        <li><b>Report:</b> class design, trade-offs, alternative design</li>
+        <li><b>Video:</b> 7 (class diagrams)</li>
+      </ul>
+    </div>
+    <div class="card d">
+      <h4><span class="tag td">E</span> Sibghat · Sequence diagram</h4>
+      <ul>
+        <li><b>Owns:</b> one full scenario where a manager choice changes the outcome (<code>alt</code>, <code>loop</code>, guards, real method names)</li>
+        <li><b>Gets help from:</b> Caleb (turn order), Ian (order and pricing), Robin (Customer)</li>
+        <li><b>Report:</b> dynamic design, how the player's choices change the result</li>
+        <li><b>Video:</b> 7 (sequence diagram)</li>
+      </ul>
+    </div>
+  </div>
+  <p><b>Together:</b> every object and message in the sequence diagram must be a class and method in the class diagram. Each reviews the other's diagram before it goes into the report.</p>
 
   <p><b>Everyone:</b> tests for their own code · reviews the others' PRs · own rows in the key-abstractions table · own reflection · declarations · speaks in the video.</p>
 
@@ -283,7 +309,7 @@
     <li>One <b>victory</b> run and one <b>defeat</b> run, every input written down, in <code>docs/test-notes.md</code></li>
     <li>No VIP, Critic, Host, combo or Happy Hour code anywhere</li>
     <li>Tag <code>stage-1</code>, then clone the tag fresh and run it</li>
-    <li><span class="tag tb">➕ Addition</span> Robin: <code>docs/uml/stage-1.png</code> class-diagram snapshot from the real code</li>
+    <li><span class="tag tb">➕ Addition</span> Takshak: <code>docs/uml/stage-1.png</code> class-diagram snapshot from the real code (Robin helps with the Customer classes)</li>
   </ul>
 </section>
 
@@ -299,7 +325,6 @@
         <li>Arrival list with ≥1 VIP and ≥1 Critic, still 6 arrivals</li>
         <li>No type checks in the controller: search for <code>instanceof</code></li>
         <li>Stage 2 victory and defeat runs in test notes</li>
-        <li><span class="tag tb">➕</span> <code>docs/uml/stage-2.png</code></li>
       </ul></div>
     <div class="card b"><h4><span class="tag tb">B</span> Ian · Stage 3 on a branch</h4>
       <ul class="check">
@@ -315,7 +340,7 @@
         <li>Do <b>not</b> merge before <code>stage-2</code></li>
       </ul></div>
   </div>
-  <p>Then: integrate, test, tag <code>stage-2</code>, fresh-clone check.</p>
+  <p>Then: integrate, test, tag <code>stage-2</code>, fresh-clone check. <span class="tag tb">➕</span> Takshak: <code>docs/uml/stage-2.png</code> snapshot, updated from Stage 1.</p>
 
   <h3>Week 3 · Stage 3 tag and diagrams</h3>
   <ul class="check">
@@ -326,8 +351,9 @@
     <li>Stage 1 and 2 behaviour still works</li>
     <li>Tag <code>stage-3</code>, fresh-clone check</li>
     <li>Caleb: README "Stage 2 → 3"</li>
-    <li>Robin: <b>class diagram</b> from the real Stage 3 code (also the stage-3 snapshot)</li>
-    <li>Caleb: <b>sequence diagram</b> for one full scenario</li>
+    <li>Takshak: <b>class diagram</b> from the real Stage 3 code (also the stage-3 snapshot)</li>
+    <li>Sibghat: <b>sequence diagram</b> for one full scenario (Caleb confirms the turn order)</li>
+    <li>Takshak and Sibghat cross-check the two diagrams and review each other's</li>
   </ul>
   <div class="box add">
     <b>➕ Note on "Stage 1 and 2 still work":</b> the old input files won't replay unchanged on Stage 3, because Stage 3 adds the Happy Hour prompt.
@@ -336,7 +362,7 @@
   </div>
 
   <h3>Week 4 · Report, video, submission</h3>
-  <p>See section 9.</p>
+  <p>See section 8.</p>
 </section>
 
 <!-- ============ 5. DECISIONS ============ -->
@@ -426,34 +452,9 @@ Order
   </table>
 </section>
 
-<!-- ============ 7. MARKS ============ -->
+<!-- ============ 7. GIT ============ -->
 <section>
-  <h2>7 · How marks are earned (100)</h2>
-  <p>No live demo. Marks come from the submitted files, the GitHub repo and the video.</p>
-  <table>
-    <tr><th style="width:24%">Criterion</th><th style="width:7%">Marks</th><th>What an A+ looks like</th><th style="width:10%">Lead</th></tr>
-    <tr><td><b>UML class diagram</b></td><td>25</td><td>Matches the Stage 3 code exactly (same class names). Visibility on every attribute and operation. Enums, abstract classes, inheritance, associations with multiplicities, composition (e.g. ComboMeal ◆ 2 MenuItem). Notes pointing out encapsulation, polymorphism and composition. Readable on one page.</td><td><span class="tag ta">A</span></td></tr>
-    <tr><td><b>UML sequence diagram</b></td><td>20</td><td>One scenario where a <b>manager choice changes the outcome</b> (shown with <code>alt</code>). Lifelines for CLI, controller, staff, domain objects. <code>loop</code> and guards. Arrival → order → Waiter and Chef → READY → SERVED → eating → payment → result check, plus VIP pricing or Happy Hour. Real method names.</td><td><span class="tag tc">C</span></td></tr>
-    <tr><td><b>Design consideration</b></td><td>15</td><td>Responsibilities table. SOLID only with a real class or method as proof. At least two trade-offs and one alternative design. How player choices change the result, with numbers from our runs.</td><td><span class="tag tall">All</span></td></tr>
-    <tr><td><b>Implementation</b></td><td>20</td><td>Every §3 rule correct and tested. No <code>instanceof</code> chains in the controller. No rules in the UI. Input can't crash it. Each tag builds from a fresh clone. Runs reproducible. Private fields, small methods, named constants.</td><td><span class="tag tall">All</span></td></tr>
-    <tr><td><b>Thinking &amp; process</b></td><td>20</td><td>Three tags on runnable commits. Stage snapshots. README transitions (new / changed / deleted files with reasons, compare links). Reviewed PRs. Everyone commits. Honest reflections. ~15-minute video, everyone speaks, timestamps in README.</td><td><span class="tag tall">All</span></td></tr>
-  </table>
-
-  <h3>Quick self-check before every PR</h3>
-  <ul class="check">
-    <li>Builds and all tests pass locally</li>
-    <li>No game rules in ConsoleUI</li>
-    <li>No <code>instanceof</code> or type switch for behaviour</li>
-    <li>Fields private; no public setters for state</li>
-    <li>Money in int cents; rounding in one place</li>
-    <li>No next-stage features merged early</li>
-    <li>DECISIONS.md / CONTRACT.md updated if behaviour or a signature changed</li>
-  </ul>
-</section>
-
-<!-- ============ 8. GIT ============ -->
-<section>
-  <h2>8 · Git routine and tag steps</h2>
+  <h2>7 · Git routine and tag steps</h2>
   <h3>Daily routine</h3>
 <pre>git switch main &amp;&amp; git pull                 # start from the latest main
 git switch -c a/customer-basics             # one branch per task: &lt;letter&gt;/&lt;topic&gt;
@@ -492,18 +493,18 @@ cd check-stage-1 &amp;&amp; sh build.sh &amp;&amp; sh test.sh &amp;&amp; sh run.
   </table>
 </section>
 
-<!-- ============ 9. SUBMISSION ============ -->
+<!-- ============ 8. SUBMISSION ============ -->
 <section>
-  <h2>9 · Report, video and submission</h2>
+  <h2>8 · Report, video and submission</h2>
   <h3>Report (PDF; each section has an owner)</h3>
   <table>
     <tr><th>Section</th><th>Owner</th></tr>
-    <tr><td>Class diagram, with annotations</td><td><span class="tag ta">A</span> Robin</td></tr>
-    <tr><td>Sequence diagram</td><td><span class="tag tc">C</span> Caleb</td></tr>
+    <tr><td>Class diagrams (one per stage), with annotations</td><td><span class="tag td">D</span> Takshak, reviewed by Sibghat</td></tr>
+    <tr><td>Sequence diagram</td><td><span class="tag td">E</span> Sibghat, reviewed by Takshak</td></tr>
     <tr><td>Key abstractions and responsibilities table</td><td>Everyone fills in their own classes</td></tr>
     <tr><td>SOLID principles (only where the code really shows them)</td><td><span class="tag tb">B</span> Ian</td></tr>
-    <tr><td>Trade-offs and one alternative design</td><td><span class="tag ta">A</span> Robin</td></tr>
-    <tr><td>How the player's choices change a result</td><td><span class="tag tc">C</span> Caleb</td></tr>
+    <tr><td>Trade-offs and one alternative design</td><td><span class="tag td">D</span> Takshak</td></tr>
+    <tr><td>How the player's choices change a result</td><td><span class="tag td">E</span> Sibghat, with Caleb</td></tr>
     <tr><td>Functional evidence (screenshots of runs)</td><td><span class="tag tc">C</span> Caleb</td></tr>
     <tr><td>Reflections</td><td>Each person writes their own</td></tr>
   </table>
@@ -517,7 +518,7 @@ cd check-stage-1 &amp;&amp; sh build.sh &amp;&amp; sh test.sh &amp;&amp; sh run.
     <tr><td>4</td><td>VIP or Critic behaviour</td><td>Robin</td></tr>
     <tr><td>5</td><td>Stage 3 feature: combo and Happy Hour; Host</td><td>Ian, with Caleb on the Host</td></tr>
     <tr><td>6</td><td>One victory and one defeat</td><td>Robin</td></tr>
-    <tr><td>7</td><td>Stage tag comparisons and diagrams</td><td>Caleb (tags), Robin (diagrams)</td></tr>
+    <tr><td>7</td><td>Stage tag comparisons and diagrams</td><td>Caleb (tags), Takshak (class diagrams), Sibghat (sequence diagram)</td></tr>
   </table>
 
   <h3>Final checklist</h3>
