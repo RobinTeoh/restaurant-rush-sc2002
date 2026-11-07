@@ -3,12 +3,12 @@
 SC2002 group assignment: a turn-based restaurant management game in Java (command line).
 
 **Repository:** https://github.com/RobinTeoh/restaurant-rush-sc2002
-**Team:** A: Robin (Customers) · B: Ian (Kitchen, Menu & Pricing) · C: Caleb (Game loop, Staff & CLI)
+**Team:** A: Robin (Customers) · B: Ian (Kitchen, Menu & Pricing) · C: Caleb (Game loop, Staff & CLI) · Takshak (class diagrams) · Sibghat (sequence diagram)
 
 ## Team docs
 | File | What it is |
 |---|---|
-| [docs/Team-Manual.pdf](docs/Team-Manual.pdf) | Easy-read manual: roles, timeline, rules, rubric, checklists |
+| [docs/Team-Manual.pdf](docs/Team-Manual.pdf) | Easy-read manual: roles, timeline, rules, checklists |
 | [docs/development-plan.md](docs/development-plan.md) | Week-by-week plan we follow |
 | [docs/team-roles.md](docs/team-roles.md) | Who owns which folders, diagrams, report sections and video segments |
 | [DECISIONS.md](DECISIONS.md) | Rules the brief leaves open, and what we chose |
@@ -126,4 +126,4 @@ Compare: https://github.com/RobinTeoh/restaurant-rush-sc2002/compare/stage-2...s
 **Deleted:** nothing.
 
 ## Video
-<!-- link + timestamps for segments 1-7 -->
+<!-- link + timestamps for segments 1-7. Segment 7 speakers: Caleb (tags), Takshak (class diagrams), Sibghat (sequence diagram) -->
