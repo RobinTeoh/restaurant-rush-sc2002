@@ -1,7 +1,7 @@
 # Design principles in our code
 
 Reference for the team and the report (brief section 5: "SRP, OCP, LSP, ISP and DIP, only where genuinely reflected in your code").
-Everything below was checked against the code on branch `a/stage3-ready`. If you change a class named here, update this file.
+Everything below was checked against the code at tag `stage-3` (identical on `main`). If you change a class named here, update this file.
 Method used in the lecture (Chapter 9): start simple, add one new requirement, see which classes had to change, explain why.
 
 ## Summary
@@ -11,7 +11,7 @@ Method used in the lecture (Chapter 9): start simple, add one new requirement, s
 | **S**ingle responsibility | Yes | `HappyHour`, `Money.percentOff`, `CustomerState.losesSatisfaction`, `Host` |
 | **O**pen / closed | Yes, with a limit | VIP and Critic (Stage 2); `ComboMeal` (Stage 3) |
 | **L**iskov substitution | Yes | `Customer` and its three subtypes |
-| **I**nterface segregation | **Weak (say so)** | `GameView` is small, but nothing here is a fat interface that we split |
+| **I**nterface segregation | **Not applied (stated honestly)** | `GameView` is small, but nothing here is a fat interface that we split |
 | **D**ependency inversion | Yes | `GameController` depends on `GameView` and the abstract `Customer` |
 
 ## S: Single responsibility (one reason to change)
@@ -59,13 +59,13 @@ Limit: `GameController` is still large (the turn loop, the menus, the labels and
 | Encapsulation | Private fields, no setters; `Customer` and `Order` change state only through methods that check the current state first (`requireState` / `requireStatus`). `MenuItem` and `Menu` are immutable. |
 | Composition | `GameController` owns its staff and statistics; `Menu` owns its `MenuItem`s; `ComboMeal` holds two `MenuItem`s (aggregation). |
 | Polymorphism | `pickDish()` (Critic orders the most expensive dish), `getDiscountPercent()` (VIP), `satisfactionLossPerTurn()`; Java picks the override at run time. |
-| Alternative design (for the report) | State pattern (one class per customer state) instead of the `CustomerState` enum; rejected, see `docs/design-log.md` 2026-10-14. |
+| Alternative design (for the report) | State pattern (one class per customer state) instead of the `CustomerState` enum; rejected, see [design-log.md](design-log.md) 2026-10-14. |
 
 ## Where the rest of this lives
 
 | What | File |
 |---|---|
-| Every decision and why | `DECISIONS.md`, `docs/design-log.md`, `docs/decision-summary.md` |
-| What changed between stages | `README.md` (Stage 1 to 2, Stage 2 to 3) |
-| Tests that prove behaviour | `docs/test-notes.md` |
-| Class diagrams | `docs/uml/` |
+| Every decision and why | [DECISIONS.md](DECISIONS.md), [design-log.md](design-log.md), [decision-summary.md](decision-summary.md) |
+| What changed between stages | [README.md](../../README.md) (Stage 1 to 2, Stage 2 to 3) |
+| Tests that prove behaviour | [test-notes.md](../testing/test-notes.md) |
+| Class diagrams | [docs/uml/](../uml/) |

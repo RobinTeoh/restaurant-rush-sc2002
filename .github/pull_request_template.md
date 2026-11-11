@@ -19,4 +19,4 @@
 - [ ] Fields private; no public setters for state
 - [ ] Money in int cents; rounding only in Money
 - [ ] No next-stage features merged early
-- [ ] DECISIONS.md / CONTRACT.md updated if behaviour or a signature changed
+- [ ] docs/design/DECISIONS.md / docs/design/CONTRACT.md updated if behaviour or a signature changed

@@ -1,27 +1,17 @@
 # Restaurant Rush
 
-SC2002 group assignment: a turn-based restaurant management game in Java (command line).
+SC2002 group assignment (SCEE GRP 5): a turn-based restaurant management game in Java, played in the console.
+You are the manager. Staff time is limited, so you decide which customers and orders come first. The game was built in three tagged, independently runnable stages.
 
 **Repository:** https://github.com/RobinTeoh/restaurant-rush-sc2002
-**Team:** A: Robin (Customers) · B: Ian (Kitchen, Menu & Pricing) · C: Caleb (Game loop, Staff & CLI) · Takshak (class diagrams) · Sibghat (sequence diagram)
 
-## Team docs
-| File | What it is |
-|---|---|
-| [docs/Team-Manual.pdf](docs/Team-Manual.pdf) | Easy-read manual: roles, timeline, rules, checklists |
-| [docs/development-plan.md](docs/development-plan.md) | Week-by-week plan we follow |
-| [docs/team-roles.md](docs/team-roles.md) | Who owns which folders, diagrams, report sections and video segments |
-| [DECISIONS.md](DECISIONS.md) | Rules the brief leaves open, and what we chose |
-| [CONTRACT.md](CONTRACT.md) | Agreed method signatures between roles |
-| [docs/test-notes.md](docs/test-notes.md) | Reproducible runs and edge-case checks |
-| [docs/design-log.md](docs/design-log.md) | Design choices, alternatives rejected, and why |
-| [docs/design-principles.md](docs/design-principles.md) | Where SOLID genuinely shows in the code (and where it does not) |
+## Contents
+[Quick start](#quick-start) · [Submission index](#submission-index) · [Base setting and reproducible runs](#base-setting-and-reproducible-runs) · [Stages and tags](#stages-and-tags) · [Diagrams](#diagrams) · [Video](#video) · [Team](#team) · [Documentation map](#documentation-map)
 
-## Requirements
+## Quick start
 - JDK 17 or newer (compiled with `--release 17`)
 - No network access needed; JUnit is bundled in `lib/`
 
-## Build, run, test
 | | Windows (cmd) | macOS / Linux / Git Bash |
 |---|---|---|
 | Build | `build.bat` | `sh build.sh` |
@@ -30,6 +20,25 @@ SC2002 group assignment: a turn-based restaurant management game in Java (comman
 | Replay a run | `run.bat stage1 < runs\stage1-victory.txt` | `sh run.sh stage1 < runs/stage1-victory.txt` |
 
 Build before running (`run` uses the last build). Type a number and press Enter to answer each prompt.
+Tests: 74 at `stage-1`, 102 at `stage-2`, 151 at `stage-3`; all pass at each tag, and CI replays every run file on each push.
+
+## Submission index
+Where to find each item the brief asks for.
+
+| Item | Where |
+|---|---|
+| Source code, build and run instructions | [`src/`](src/), [`test/`](test/), [Quick start](#quick-start) |
+| README (repository URL, stage comparisons, video timestamps) | this file: [Stages and tags](#stages-and-tags), [Video](#video) |
+| PDF report | submitted in the archive: diagrams, design discussion, functional evidence, reflections |
+| Recorded video | [Video](#video) |
+| Declarations (Original Work, use of GAI) | signed forms, submitted in the archive |
+| Class diagrams (one per stage) | [Diagrams](#diagrams) |
+| Sequence diagram (one scenario: VIP, Happy Hour, Combo at turn 4) | [Diagrams](#diagrams) |
+| Design discussion (decisions, principles, alternatives) | [`docs/design/`](docs/design/) |
+| Stage tags and comparisons | [Stages and tags](#stages-and-tags) |
+| Tests and reproducible runs | [`test/`](test/), [`runs/`](runs/), [`docs/testing/test-notes.md`](docs/testing/test-notes.md) |
+| Process evidence (CI, PR template, design log, roles) | [`.github/`](.github/), [`docs/design/design-log.md`](docs/design/design-log.md), [`docs/process/team-roles.md`](docs/process/team-roles.md), the pull requests on GitHub |
+| AI history | each member's own branch; the links are in the report, Appendix E |
 
 ## Base setting and reproducible runs
 18 turns, 2 tables, one Waiter, Chef and Cashier, customers arriving on turns 1, 4, 7, 10, 13 and 16.
@@ -39,11 +48,13 @@ Victory needs at least 4 paid customers, at least $45.00 revenue and an average 
 VIP loses 5 satisfaction per waiting turn and gets 10% off; Critic loses 12 and always orders the most expensive dish; Regular loses 8.
 
 **How customers choose food:** customer *n* (1 to 6, in arrival order) picks a dish with `new Random(32 + n)`, so every run is the same.
-The customers order Salad, Burger, Pasta, Pasta (the Critic), Pasta, Salad. Details: [DECISIONS.md](DECISIONS.md) D5, D6, D6b and D7.
+The customers order Salad, Burger, Pasta, Pasta (the Critic), Pasta, Salad. Details: [DECISIONS.md](docs/design/DECISIONS.md) D5, D6, D6b and D7.
 
 | Run file (replay at tag) | Result |
 |---|---|
 | `runs/stage3-victory.txt` (`stage-3`) | VICTORY: 4 paid, $87.57, average 80.0 (Happy Hour switched on in turn 7) |
+| `runs/stage3-victory-happyhour-t4.txt` (`main`) | VICTORY: 4 paid, $86.80, average 75.5 (the report's Section 3 scenario: Happy Hour started at turn 4) |
+| `runs/stage3-victory-continue-t4.txt` (`main`) | VICTORY: 4 paid, $91.17, average 74.3 (the same scenario, continuing at turn 4 without Happy Hour) |
 | `runs/stage3-defeat.txt` (`stage-3`) | DEFEAT: the Chef is never given an order, so nobody is served |
 | `runs/stage2-victory.txt` (`stage-2`) | VICTORY: 4 paid, $58.50, average 75.5 |
 | `runs/stage2-victory-5paid.txt` (`stage-2`) | VICTORY: 5 paid, $76.50, average 73.2 (the most that can pay) |
@@ -55,14 +66,20 @@ The customers order Salad, Burger, Pasta, Pasta (the Critic), Pasta, Salad. Deta
 
 A run file belongs to its stage, because later stages change the customers and the menu. To replay one: `git checkout stage-N`, build, then `sh run.sh stageN < runs/stageN-...txt` (`run.bat stageN < ...` on Windows). Without the `stageN` argument the game starts the latest stage (Stage 3 at the `stage-3` tag; each tag defaults to its own stage).
 
-What each run does, the edge cases and the test evidence: [docs/test-notes.md](docs/test-notes.md).
+The two `-t4` run files were added after the `stage-3` tag (for the report's Section 3 diagram), so replay them on `main`. The Stage 3 code is identical at the tag and on `main`.
 
-## Stages
-| Stage | Tag | Adds |
-|---|---|---|
-| 1 | `stage-1` | Regular customers, menu, Waiter, Chef, Cashier, full turn sequence, both endings |
-| 2 | `stage-2` | VIP and Critic customers |
-| 3 | `stage-3` | Host, ComboMeal, Happy Hour |
+What each run does, the edge cases and the test evidence: [docs/testing/test-notes.md](docs/testing/test-notes.md).
+
+## Stages and tags
+| Stage | Tag | Commit | Adds | Compare |
+|---|---|---|---|---|
+| 1 | `stage-1` | `14f368c` | Regular customers, menu, Waiter, Chef, Cashier, full turn sequence, both endings | first stage |
+| 2 | `stage-2` | `68d2336` | VIP and Critic customers | [stage-1...stage-2](https://github.com/RobinTeoh/restaurant-rush-sc2002/compare/stage-1...stage-2) |
+| 3 | `stage-3` | `e6ccf01` | Host, ComboMeal, Happy Hour | [stage-2...stage-3](https://github.com/RobinTeoh/restaurant-rush-sc2002/compare/stage-2...stage-3) |
+
+Each tag builds and runs on its own: `git checkout stage-N`, build, then run.
+
+The file paths in the two comparison sections below are as they were at each tag. After `stage-3` the documentation was reorganised under `docs/` (no source, test or run file moved).
 
 ### Stage 1 → Stage 2
 Compare: https://github.com/RobinTeoh/restaurant-rush-sc2002/compare/stage-1...stage-2
@@ -125,5 +142,54 @@ Compare: https://github.com/RobinTeoh/restaurant-rush-sc2002/compare/stage-2...s
 
 **Deleted:** nothing.
 
+## Diagrams
+All sources and images are in [`docs/uml/`](docs/uml/).
+
+| Diagram | Files |
+|---|---|
+| Class diagram, Stage 1 | [`stage-1-class-diagram.drawio`](docs/uml/stage-1-class-diagram.drawio) |
+| Class diagram, Stage 2 | [`stage-2.png`](docs/uml/stage-2.png), [`stage-2-class-diagram.drawio`](docs/uml/stage-2-class-diagram.drawio) |
+| Class diagram, Stage 3 (final) | [`stage-3.png`](docs/uml/stage-3.png), [`stage-3-class-diagram.drawio`](docs/uml/stage-3-class-diagram.drawio) |
+| Sequence diagram (Figure 3-1, four parts) | [Part 1, messages 1-19](<docs/uml/Sequence Diagram-Part 1_ messages 1-19.png>), [Part 2, messages 20-51](<docs/uml/Sequence Diagram-Part 2_ messages 20-51.png>), [Part 3, messages 52-72](<docs/uml/Sequence Diagram-Part 3_ messages 52-72.png>), [Part 4, messages 73-89](<docs/uml/Sequence Diagram-Part 4_ messages 73-89.png>) |
+| Customer design (early drafts) | [class v1](docs/uml/customer-class-v1.png), [class v2](docs/uml/customer-class-v2.png), [state v1](docs/uml/customer-state-v1.png) |
+
+The sequence diagram replays the scenario in [`runs/stage3-victory-happyhour-t4.txt`](runs/stage3-victory-happyhour-t4.txt); its alternative branch is [`runs/stage3-victory-continue-t4.txt`](runs/stage3-victory-continue-t4.txt).
+
 ## Video
-<!-- link + timestamps for segments 1-7. Segment 7 speakers: Caleb (tags), Takshak (class diagrams), Sibghat (sequence diagram) -->
+Video link: TBD (fill in before submission)
+
+| # | Segment | Speaker | Start |
+|---|---|---|---|
+| 1 | Game launch from the submitted project, and an overview of the three stages | Caleb | TBD |
+| 2 | Meaningful manager choices, including a decision where staff are constrained | Caleb | TBD |
+| 3 | A dish going READY, then SERVED, then paid | Robin | TBD |
+| 4 | A VIP or Critic behaviour | Robin | TBD |
+| 5 | A Stage 3 feature | Ian | TBD |
+| 6 | One victory and one defeat (separate reproducible runs) | Ian | TBD |
+| 7 | Stage tag comparisons and the class diagrams | Takshak | TBD |
+| 8 | Use case and sequence diagram | Sibghat | TBD |
+| 9 | Individual contributions and key learning | each member | TBD |
+
+## Team
+| Member | Role |
+|---|---|
+| Robin Teoh | Customers (`customer/`); customer state diagram |
+| Ian Tan | Kitchen, menu and pricing (`menu/`, `order/`, `pricing/`, Chef), including ComboMeal and Happy Hour |
+| Caleb Soon | Game loop, staff and CLI (`app/`, `boundary/`, `control/`, `place/`, Waiter, Cashier, Host), CI and tags |
+| Takshak | Class diagrams, one per stage |
+| Sibghat Ullah | Sequence diagram |
+
+Who owns which folder, diagram, report section and video segment: [`docs/process/team-roles.md`](docs/process/team-roles.md).
+
+## Documentation map
+| Folder / file | What it holds |
+|---|---|
+| [`docs/design/DECISIONS.md`](docs/design/DECISIONS.md) | Rules the brief leaves open, and what we chose (D1-D15) |
+| [`docs/design/CONTRACT.md`](docs/design/CONTRACT.md) | Method signatures between roles, checked against the code |
+| [`docs/design/design-log.md`](docs/design/design-log.md) | Design choices, alternatives rejected, and why |
+| [`docs/design/design-principles.md`](docs/design/design-principles.md) | Where SOLID genuinely shows in the code, and where it does not |
+| [`docs/design/decision-summary.md`](docs/design/decision-summary.md) | One-page summary of every decision by stage |
+| [`docs/testing/test-notes.md`](docs/testing/test-notes.md) | Reproducible runs, edge cases and test evidence per stage |
+| [`docs/uml/`](docs/uml/) | Class diagrams, sequence diagram and customer diagrams |
+| [`docs/process/`](docs/process/) | Team roles, the original development plan, and the team manual (PDF and HTML) |
+| [`runs/`](runs/) | Recorded player inputs for every stage, replayed by the tests and CI |

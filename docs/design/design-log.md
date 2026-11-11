@@ -14,7 +14,7 @@ This feeds the report's trade-offs, alternative design and stage-evolution secti
 | 2026-10-15 | `Customer` follows the agreed CONTRACT.md methods: `loseSatisfaction()`, `hasLeft()`, `chooseFood(Menu)`, `getState()`, plus `getRecordedSatisfaction()`, which the contract itself lists as a gap. The one exception is payment (next rows: `pay()`). | Adding methods on our own | The contract is what keeps the three parts independent. | Robin (A) |
 | 2026-10-16 | Food choice (D5): customer *n* picks its own dish with `new Random(SEED + n)` inside `chooseFood(menu)`. **No Pasta counter in code**: the fixed seed is chosen so the six customers give at most 2 Pasta, and a unit test checks it. Proposed seed **32** (Salad, Burger, Pasta, Burger, Pasta, Salad with menu order Salad, Burger, Pasta): any 4 of the first 5 customers ≥ $57. | `static` shared `Random` + `static` Pasta count in `Customer`; a separate `FoodChooser` class (injected, or replaying customers 1..n); a runtime check that re-rolls the seed until it is winnable | Static fields are hidden global state (tests leak into each other) and a game-wide count is not a customer's job (SRP). Each customer's choice now depends only on itself, so no shared state and no extra class are needed, and Caleb only does `new Customer(id)`. The seed is a constant, so a runtime check would give the same answer every run; checking once in a test is enough. **Trade-off for the report:** every game has the same orders; variety comes from the manager's choices. *Seed and "no counter" need team agreement (D5/D6); re-check once Ian's menu order is known.* | Robin (A) |
 | 2026-10-15 | `loseSatisfaction()` does nothing outside WAITING, SEATED and ORDERED (as the contract note says), because it is called on every customer at turn end. Which states lose satisfaction is decided by `CustomerState.losesSatisfaction()`. | Throwing when called on an EATING customer; a private check inside `Customer` | Being called on everyone each turn is normal, not a bug. Which states wait for service is knowledge about the states, so it lives in the enum (cohesion). | Robin (A) |
-| 2026-10-16 | **Payment uses `pay()`** (READY_TO_PAY → PAID). **Differs from CONTRACT.md**, which has `recordSatisfactionAtPayment()`. *To agree with Caleb:* either the contract changes to `pay()`, or `pay()` is renamed. | Keeping both `pay()` and `recordSatisfactionAtPayment()` public | Two public ways to do one thing: the Cashier could call the wrong one, or both, or record before paying. One method cannot be called out of order. | Robin (A) |
+| 2026-10-16 | **Payment uses `pay()`** (READY_TO_PAY → PAID). **Differs from CONTRACT.md**, which has `recordSatisfactionAtPayment()`. *Resolved:* the contract was changed to `pay()` (see [CONTRACT.md](CONTRACT.md), C → A). | Keeping both `pay()` and `recordSatisfactionAtPayment()` public | Two public ways to do one thing: the Cashier could call the wrong one, or both, or record before paying. One method cannot be called out of order. | Robin (A) |
 | 2026-10-16 | No separate recorded-satisfaction field. `getRecordedSatisfaction()` returns the satisfaction once the customer is PAID, and throws before that. | A `recordedSatisfaction` field with `-1` meaning "not paid yet" | Satisfaction cannot change after SERVED, so the value at payment is the current value. Two copies could drift, and `-1` is a magic value. | Robin (A) |
 | 2026-10-16 | `Customer` no longer stores `tableNo` or `chosenFood`. | `tableNo`/`getTable()` and `chosenFood`/`getChosenItem()` | `Table` already knows its occupant and `Order` already holds the dish; a second copy can get out of sync. If Caleb needs `getTable()`, it is a small addition. | Robin (A) |
 | 2026-10-15 | **Stage 1 `Customer` is one ordinary (not abstract) class**, with a constant `LOSS_PER_TURN = 8`. No subclasses in Stage 1. | Abstract `Customer` + `RegularCustomer`, with the loss as an overridable method or a constructor parameter (DECISIONS D13) | Stage 1 is designed from the Stage 1 requirements only (professor's guidance): there is one kind of customer and one loss value. When Stage 2 adds VIP and Critic, `Customer` becomes the parent class and the loss moves into the subclasses; that refactor is explained in the README's Stage 1 → 2 section. | Robin (A) |
@@ -54,15 +54,15 @@ The contract only lets other classes **read** a customer's state (`getState()`).
 
 ## Stage 1 whole-system class diagram (snapshot for the `stage-1` tag)
 
-Editable source: [uml/stage-1-class-diagram.drawio](uml/stage-1-class-diagram.drawio) (open in draw.io; export `docs/uml/stage-1.png` before tagging). Built from the Stage 1 code: 19 classes with stereotypes (entity, control, boundary, enumeration, utility), visibility on every member, associations with multiplicities, composition from `GameController` to the staff and statistics and from `Menu` to `MenuItem`, `ConsoleUI` implementing `GameView`, and notes on encapsulation, polymorphism/DIP and composition. All lines are straight (horizontal or vertical) and none cross. Stage 1 has no inheritance yet; `Customer` becomes the parent of `VIPCustomer` and `CriticCustomer` in Stage 2.
+Editable source: [uml/stage-1-class-diagram.drawio](../uml/stage-1-class-diagram.drawio) (open in draw.io; export `docs/uml/stage-1.png` before tagging). Built from the Stage 1 code: 19 classes with stereotypes (entity, control, boundary, enumeration, utility), visibility on every member, associations with multiplicities, composition from `GameController` to the staff and statistics and from `Menu` to `MenuItem`, `ConsoleUI` implementing `GameView`, and notes on encapsulation, polymorphism/DIP and composition. All lines are straight (horizontal or vertical) and none cross. Stage 1 has no inheritance yet; `Customer` becomes the parent of `VIPCustomer` and `CriticCustomer` in Stage 2.
 
 Left out on purpose, to keep the diagram readable: the data records `TurnSnapshot`, `GameResult` and `ActionResult` (real classes, but they only carry data between the game and the screen) and `GameController`'s private helper methods. The tables, queue, customers, orders and menu that `GameController` keeps are shown as attributes of `GameController` instead of as extra arrows.
 
 ## Customer class diagram (v2, Stage 1, 2026-10-16)
 
-Replaces v1 below. The code in `src/restaurant/customer/` matches it. Drawn by Robin: [uml/customer-class-v2.png](uml/customer-class-v2.png).
+Replaces v1 below. The code in `src/restaurant/customer/` matches it. Drawn by Robin: [uml/customer-class-v2.png](../uml/customer-class-v2.png).
 
-![Customer class diagram v2](uml/customer-class-v2.png)
+![Customer class diagram v2](../uml/customer-class-v2.png)
 
 - **Customer**: `- LOSS_PER_TURN: int = 8`, `- MAX_SATISFACTION: int = 100`, `- SEED: long = 32` (all static, readOnly), `- id: int {readOnly}`, `- satisfaction: int`; `+ Customer(id: int)`, `+ seat()`, `+ chooseFood(menu: Menu): MenuItem` (waiting for Ian's classes), `+ serve()`, `+ finishEating()`, `+ pay()`, `+ loseSatisfaction()`, `+ hasLeft(): boolean`, `+ getState(): CustomerState`, `+ getRecordedSatisfaction(): int`, `+ getId(): int`, `+ getSatisfaction(): int`, `- requireState(expected: CustomerState)`.
 - **CustomerState** «enumeration»: WAITING, SEATED, ORDERED, EATING, READY_TO_PAY, PAID, LEFT; `+ losesSatisfaction(): boolean`.
@@ -70,17 +70,17 @@ Replaces v1 below. The code in `src/restaurant/customer/` matches it. Drawn by R
 
 ## Customer class diagram (v1, Stage 1)
 
-Drawn by Robin on 2026-10-15: [uml/customer-class-v1.png](uml/customer-class-v1.png). Stage 1 only: one ordinary `Customer` class, the `CustomerState` enum, and Ian's `Menu`/`MenuItem` (only used by `chooseFood`).
+Drawn by Robin on 2026-10-15: [uml/customer-class-v1.png](../uml/customer-class-v1.png). Stage 1 only: one ordinary `Customer` class, the `CustomerState` enum, and Ian's `Menu`/`MenuItem` (only used by `chooseFood`).
 
 Pending team answers (see "Open questions" above): whether `tableNo`/`getTable()` and `chosenFood`/`getChosenItem()` are needed, how the eating rule is timed (`finishEating()`), and whether the Cashier calls `pay()` or `recordSatisfactionAtPayment()`.
 
-![Customer class diagram v1](uml/customer-class-v1.png)
+![Customer class diagram v1](../uml/customer-class-v1.png)
 
 ## Customer state machine (draft v1, Stage 1)
 
-Hand-drawn by Robin on 2026-10-13: [uml/customer-state-v1.png](uml/customer-state-v1.png). The first sketch wrongly had a PAID → LEFT arrow; it was removed (LEFT means "left unhappy without paying" and is counted as an unhappy departure in brief §3.5). The text version below is the same diagram.
+Hand-drawn by Robin on 2026-10-13: [uml/customer-state-v1.png](../uml/customer-state-v1.png). The first sketch wrongly had a PAID → LEFT arrow; it was removed (LEFT means "left unhappy without paying" and is counted as an unhappy departure in brief §3.5). The text version below is the same diagram.
 
-![Customer state machine v1](uml/customer-state-v1.png)
+![Customer state machine v1](../uml/customer-state-v1.png)
 
 ```mermaid
 stateDiagram-v2
@@ -106,7 +106,7 @@ Open points: who triggers EATING → READY_TO_PAY (the turn loop, step 4), and w
 
 ## Stage 3 whole-system class diagram (snapshot for the `stage-3` tag)
 
-Editable source: [uml/stage-3-class-diagram.drawio](uml/stage-3-class-diagram.drawio) (open in draw.io). PNG export: [uml/stage-3.png](uml/stage-3.png), rendered with the draw.io viewer. Built from the Stage 2 diagram plus the Stage 3 code.
+Editable source: [uml/stage-3-class-diagram.drawio](../uml/stage-3-class-diagram.drawio) (open in draw.io). PNG export: [uml/stage-3.png](../uml/stage-3.png), rendered with the draw.io viewer. Built from the Stage 2 diagram plus the Stage 3 code.
 
 New: `Host` (control), `HappyHour` (entity: it keeps its own state, `used` and `turnsLeft`), `ComboMeal` (entity, extends `MenuItem`). `GameController` owns a `Host` and an optional `HappyHour`. `Order` now stores its `price` and depends on `HappyHour` when it is created. Changed operations: `Customer.recover`, `Menu.withCombos`, `Order.createOrder(..., happyHour)`, `Waiter.takeOrder(..., happyHour)`, `GameConfig` scenario methods, and the longer `GameController` constructor.
 

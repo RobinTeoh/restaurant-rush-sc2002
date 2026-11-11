@@ -3,9 +3,9 @@
 The exact method name, parameters and return type for every call that crosses from one person's folders into another's.
 **This file is the only thing keeping our parts independent. If you need to change it, tell the other two before you push.**
 
-Roles: A = Robin (Customers) · B = Ian (Kitchen, Menu & Pricing) · C = Caleb (Game loop, Staff & CLI). See [docs/team-roles.md](docs/team-roles.md).
+Roles: A = Robin (Customers) · B = Ian (Kitchen, Menu & Pricing) · C = Caleb (Game loop, Staff & CLI). See [team-roles.md](../process/team-roles.md).
 
-**Method names are agreed (12 Oct 2026).** Types marked *(proposed)* were not stated at the meeting; confirm or change them before coding against them.
+**Method names were agreed on 12 Oct 2026, and every signature below matches the code at tag `stage-3`.** Rows marked *Added*, *Changed* or *Stage N* record how the contract grew; the reason for each change is in [design-log.md](design-log.md).
 
 ## C → A (game loop calls Customer)
 
@@ -28,7 +28,7 @@ Implemented in Stage 1 (`Customer.java`). A call made in the wrong state throws 
 | *Added:* Display | `Customer` | `getId()`, `getSatisfaction()` | `public int getId()`, `public int getSatisfaction()` | For the start-of-turn display |
 
 ## C → B (game loop calls kitchen and orders)
-| Need | Class | Agreed method | Full signature *(proposed types)* | Notes |
+| Need | Class | Method | Full signature | Notes |
 |---|---|---|---|---|
 | Create order | `Order` (static factory) | `createOrder(customer, item, turn)` | `public static Order createOrder(Customer customer, MenuItem item, int turn)` | Price locked when the order is taken. Caleb calls `customer.chooseFood(menu)` first, then passes the dish in |
 | Chef works on order | `Chef` | `chef.work(order)` | `public boolean work(Order order)` | Advances one prep unit. Returns `false` (no change) if the order is READY, SERVED, PAID or CANCELLED, so the game can ask again without using up the task |
@@ -37,18 +37,18 @@ Implemented in Stage 1 (`Customer.java`). A call made in the wrong state throws 
 | Get bill | `Order` | `getBill()` | `public int getBill()` | Integer **cents** (e.g. 1800 = $18.00). **Stage 2:** item price less the customer's discount, via `Money.percentOff` (VIP Burger 1350). Throws for a CANCELLED order (D3) |
 | *Stage 2:* Percent off | `Money` | `Money.percentOff(cents, percent)` | `public static int percentOff(int cents, int percent)` | D1 half-up rounding; the only place a percentage is applied |
 | *Stage 2:* Who arrives | `ArrivalSchedule` | `arrivalsOn(turn)` | `public List<Customer> arrivalsOn(int turn)` | **Changed** from a count to the customers themselves. New constructor `ArrivalSchedule(List<Integer> turns, List<Customer> customers)`; the turns-only constructor means all Regular. |
-| *Proposed by B:* Mark paid | `Order` | `markPaid()` | `public void markPaid()` | Cashier, after `customer.pay()`. Only allowed when SERVED |
-| *Proposed by B:* Cancel order | `Order` | `cancel()` | `public void cancel()` | Controller, when the customer has left (D3). Only allowed when PLACED or READY |
-| *Proposed by B:* Whose order | `Order` | `getCustomer()` | `public Customer getCustomer()` | Also `getItem()`, `getStatus()`, `getUnitsDone()`, `getTurnPlaced()` for the display |
-| *Proposed by B:* Show money | `Money` | `Money.format(cents)` | `public static String format(int cents)` | 1800 → `"$18.00"`. The only place cents become dollar text |
-| *Proposed by B:* The menu | `Menu` | `Menu.standard()` | `public static Menu standard()` | Salad $9.00 (1 unit), Burger $15.00 (1), Pasta $18.00 (2), in that order (Robin's seed relies on it) |
-| *Stage 3, proposed by B:* Create order with Happy Hour | `Order` | `createOrder(customer, item, turn, happyHour)` | `public static Order createOrder(Customer customer, MenuItem item, int turn, HappyHour happyHour)` | Price is saved when the order is taken: customer discount, then 20% if Happy Hour is on. `happyHour` can be `null`. The 3-argument one still works |
-| *Stage 3, proposed by B:* Combo menu | `Menu` | `Menu.withCombos()` | `public static Menu withCombos()` | Use for `stage3` instead of `Menu.standard()` (D8). In `Main`: `GameConfig.STAGE_3.equals(scenario) ? Menu.withCombos() : Menu.standard()` |
-| *Stage 3, proposed by B:* Happy Hour | `HappyHour` | `canActivate()`, `activate()`, `isActive()`, `getTurnsLeft()`, `endTurn()` | | One per game. Only show the option while `canActivate()`. `getTurnsLeft()` is 2, 1, then 0. Call `endTurn()` at the end of every turn |
-| *Stage 3, proposed by B:* Happy Hour recovery | `HappyHour` | `recoverWaiting(customers)` | `public void recoverWaiting(List<Customer> customers)` | Start of each Happy Hour turn (D9). Calls `Customer.recover(15)` on each customer; only waiting ones gain |
+| *Added by B:* Mark paid | `Order` | `markPaid()` | `public void markPaid()` | Cashier, after `customer.pay()`. Only allowed when SERVED |
+| *Added by B:* Cancel order | `Order` | `cancel()` | `public void cancel()` | Controller, when the customer has left (D3). Only allowed when PLACED or READY |
+| *Added by B:* Whose order | `Order` | `getCustomer()` | `public Customer getCustomer()` | Also `getItem()`, `getStatus()`, `getUnitsDone()`, `getTurnPlaced()` for the display |
+| *Added by B:* Show money | `Money` | `Money.format(cents)` | `public static String format(int cents)` | 1800 → `"$18.00"`. The only place cents become dollar text |
+| *Added by B:* The menu | `Menu` | `Menu.standard()` | `public static Menu standard()` | Salad $9.00 (1 unit), Burger $15.00 (1), Pasta $18.00 (2), in that order (Robin's seed relies on it) |
+| *Stage 3, added by B:* Create order with Happy Hour | `Order` | `createOrder(customer, item, turn, happyHour)` | `public static Order createOrder(Customer customer, MenuItem item, int turn, HappyHour happyHour)` | Price is saved when the order is taken: customer discount, then 20% if Happy Hour is on. `happyHour` can be `null`. The 3-argument one still works |
+| *Stage 3, added by B:* Combo menu | `Menu` | `Menu.withCombos()` | `public static Menu withCombos()` | Use for `stage3` instead of `Menu.standard()` (D8). In `Main`: `GameConfig.STAGE_3.equals(scenario) ? Menu.withCombos() : Menu.standard()` |
+| *Stage 3, added by B:* Happy Hour | `HappyHour` | `canActivate()`, `activate()`, `isActive()`, `getTurnsLeft()`, `endTurn()` | | One per game. Only show the option while `canActivate()`. `getTurnsLeft()` is 2, 1, then 0. Call `endTurn()` at the end of every turn |
+| *Stage 3, added by B:* Happy Hour recovery | `HappyHour` | `recoverWaiting(customers)` | `public void recoverWaiting(List<Customer> customers)` | Start of each Happy Hour turn (D9). Calls `Customer.recover(15)` on each customer; only waiting ones gain |
 
 ## B → A (pricing calls Customer)
-| Need | Class | Agreed method | Full signature *(proposed types)* | Notes |
+| Need | Class | Method | Full signature | Notes |
 |---|---|---|---|---|
 | Get discount for this customer | `Customer` | `getDiscountPercent()` | `public int getDiscountPercent()` | **Stage 2.** 0 by default, `VIPCustomer` returns 10. Read by `Order.getBill()`. Rounding per D1. |
 | Happy Hour recovery | `Customer` | `recover(int points)` | `public final void recover(int points)` | **Stage 3, agreed.** Adds `points` (capped at 100), only while WAITING, SEATED or ORDERED; ignored for EATING, READY_TO_PAY, PAID and LEFT (a customer who left never returns). Negative points throw. B calls it with 15 (D9). |

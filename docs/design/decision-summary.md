@@ -1,7 +1,7 @@
 # Team decision summary (Stages 1 to 3)
 
 One page for the report and the video: every rule the brief leaves open, what the team chose, and what that changed in the game or the code.
-Full wording and alternatives: [DECISIONS.md](../DECISIONS.md) (rules) and [design-log.md](design-log.md) (design choices).
+Full wording and alternatives: [DECISIONS.md](DECISIONS.md) (rules) and [design-log.md](design-log.md) (design choices).
 
 ## Stage 1: basic operation
 
@@ -43,6 +43,7 @@ Full wording and alternatives: [DECISIONS.md](../DECISIONS.md) (rules) and [desi
 
 **Outcome:** the Stage 3 base run is still winnable (151 tests, including `Stage3BaseSettingTest`). Happy Hour is the manager's new timing choice: switching it on when many customers wait both saves them from leaving and discounts orders.
 
-## Open items for the team
-* Confirm the D9 order with Caleb: the start-of-turn display is drawn before the Happy Hour prompt, so the +15 appears in the messages, not in that first display.
-* Record Stage 3 evidence in `docs/test-notes.md` and the Stage 2 to 3 README section (still empty).
+## Known behaviour to note
+* The start-of-turn display is drawn before the Happy Hour prompt, so the +15 recovery appears in the messages that follow, not in that first display (D9).
+
+Stage 3 evidence is in [test-notes.md](../testing/test-notes.md) and in the Stage 2 to 3 section of the [README](../../README.md).
