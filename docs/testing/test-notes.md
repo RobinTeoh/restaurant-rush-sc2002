@@ -5,7 +5,7 @@ Replay one with `run.bat < runs\<file>` (Windows) or `sh run.sh < runs/<file>` (
 CI replays every `runs/stage<N>-victory*.txt` and `runs/stage<N>-defeat*.txt` and checks for VICTORY / DEFEAT.
 
 Base setting for every run: 18 turns, 2 tables, 1 Waiter / Chef / Cashier, arrivals on turns 1, 4, 7, 10, 13, 16,
-food chosen by `new Random(32 + customerId)` (DECISIONS D5/D6).
+food chosen by `new Random(32 + customerId)` ([DECISIONS](../design/DECISIONS.md) D5/D6).
 Targets: at least 4 paid, revenue at least $45.00, average satisfaction of paid customers at least 60.
 
 * **Stage 1** (all Regular): customers 1 to 6 order Salad, Burger, Pasta, Burger, Pasta, Salad ($9, $15, $18, $15, $18, $9).
@@ -64,9 +64,9 @@ and LEFT exactly at 0, arrivals match the schedule, revenue equals the dishes of
 the victory flag is right, at most 5 paid, customer 6 never paid, and always exactly 18 turns.
 **Result: 0 failures, no crashes** (67 games were won by chance; the most customers paid in any game was 4).
 
-### Not yet covered by an automated test
+### Coverage note
 
-* ~~The turn-16 customer never paying (edge case 17)~~ **Added in Stage 2:** `GameControllerTest.turnSixteenCustomerCannotPayEvenWhenServedAsFastAsPossible`.
+Every edge case above has an automated test or a replayable run file. Edge case 17 (the turn-16 customer never paying) was added in Stage 2: `GameControllerTest.turnSixteenCustomerCannotPayEvenWhenServedAsFastAsPossible`.
 
 ### Known behaviours to document (not bugs)
 
@@ -133,7 +133,11 @@ Customers 1 to 6 order (seed 32, D8): Salad + Burger ($21.60), Salad + Pasta ($2
 | Run file | What the manager does | Result | Paid | Revenue | Avg satisfaction | Unhappy departures |
 |---|---|---|---|---|---|---|
 | `runs/stage3-victory.txt` | Same Waiter priority as Stage 1 (serve, then take orders, then seat); the Host seats automatically; Happy Hour is switched on at the start of turn 7, so customer 3's Pasta is locked at $14.40. | **VICTORY** | 4 | $87.57 | 80.0 | 0 |
+| `runs/stage3-victory-happyhour-t4.txt` | The report's Section 3 scenario, Happy Hour branch: at the start of turn 4 the manager starts Happy Hour (option 2) and customer 2 (VIP, Salad + Pasta) is locked at $17.50. Otherwise the same play as the first run. | **VICTORY** | 4 | $86.80 | 75.5 | 0 |
+| `runs/stage3-victory-continue-t4.txt` | The same scenario, other branch: identical input except line 12 (turn 4 Happy Hour prompt), where the manager continues (option 1). Customer 2 pays $21.87. | **VICTORY** | 4 | $91.17 | 74.3 | 0 |
 | `runs/stage3-defeat.txt` | The Chef is never given an order. The Host seats customers 1 and 2, but nothing is cooked. | **DEFEAT** | 0 | $0.00 | N/A | 2 |
+
+The two `-t4` runs differ only in the turn 4 Happy Hour prompt, so they show what that one choice is worth. Starting Happy Hour restores customer 2's satisfaction on turn 5 (95 back to 100), so it pays at satisfaction 90 instead of 85 (average 75.5 against 74.3), but its 20% discount costs $4.37 of revenue ($86.80 against $91.17). Both branches win. Section 3 of the report walks through the Happy Hour branch message by message.
 
 ### How the player's choices change the result (for the report)
 
@@ -153,7 +157,7 @@ Customers 1 to 6 order (seed 32, D8): Salad + Burger ($21.60), Salad + Pasta ($2
 | 6 | VIP discount first, then Happy Hour: VIP Burger = $10.80; price locked at order time (4.3) | `OrderTest.happyHourAfterVipDiscount`, `priceLockedAfterHappyHourEnds`, `vipComboInHappyHour`; `GameControllerTest.vipBurgerOrderedDuringHappyHourIsLockedAt1080` |
 | 7 | +15 recovery for waiting customers only, capped at 100; none for served, eating or ready customers (4.3) | `HappyHourTest.waitingCustomersRecover15`, `recoveryCappedAt100`, `noRecoveryWhenOff`; `CustomerTest` recover cases |
 | 8 | Stage 1 and 2 behaviour is unchanged by Stage 3 (Happy Hour is never offered in Stages 1 and 2: `GameControllerTest.stage1And2GamesNeverAskAboutHappyHour`) | The 102 Stage 2 tests pass unchanged; CI replays the Stage 1, 2 and 3 run files |
-| 9 | The base run is still winnable; the six orders are fixed (4 of 6 contain Pasta, so D5's "at most 2 Pasta" is a Stage 1 aim only, see DECISIONS) | `Stage3BaseSettingTest` (orders, any 4 of the first 5 reach $45, replays `runs/stage3-victory.txt` to a victory and `runs/stage3-defeat.txt` to a defeat); Ian's check in D8: a simple play gives 4 paid, $91.17 |
+| 9 | The base run is still winnable; the six orders are fixed (4 of 6 contain Pasta, so D5's "at most 2 Pasta" is a Stage 1 aim only, see [DECISIONS](../design/DECISIONS.md)) | `Stage3BaseSettingTest` (orders, any 4 of the first 5 reach $45, replays `runs/stage3-victory.txt` to a victory and `runs/stage3-defeat.txt` to a defeat); Ian's check in D8: a simple play gives 4 paid, $91.17 |
 
 **Result:** 151 tests pass (102 from Stage 2 + 49 new).
 

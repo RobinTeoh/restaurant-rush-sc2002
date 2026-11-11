@@ -1,12 +1,14 @@
 # Restaurant Rush: development plan
 
+> **Historical document.** This is the plan we wrote at the start of the project. Paths below are as planned on day one: `DECISIONS.md`, `CONTRACT.md`, the design log, the principles notes and the test notes now live under [docs/design/](../design/) and [docs/testing/](../testing/). What was actually built and tested is recorded in the [README](../../README.md) and the report.
+
 Roles (from [team-roles.md](team-roles.md)):
 **A = Customers (Robin)**, **B = Kitchen, Menu & Pricing, incl. all of Happy Hour (Ian)**, **C = Game loop, Staff & CLI (Caleb)**.
 Diagrams: **Takshak = class diagrams**, **Sibghat = sequence diagram**. The two work together and review each other's diagram (see Week 3, step 5).
 
 The plan assumes **4 weeks**. If your deadline is shorter, squeeze each week proportionally, but keep the order: the tags must happen in sequence.
 
-> **Status:** first meeting held 12 Oct 2026. Decisions recorded in [DECISIONS.md](../DECISIONS.md).
+> **Status:** first meeting held 12 Oct 2026. Decisions recorded in [DECISIONS.md](../design/DECISIONS.md).
 > Lines marked **➕ Addition** were added after the meeting to protect rubric marks; everything else is the plan as agreed.
 
 ---
