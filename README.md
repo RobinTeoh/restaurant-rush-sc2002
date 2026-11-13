@@ -8,7 +8,7 @@ You are the manager. Staff time is limited, so you decide which customers and or
 **Repository:** https://github.com/RobinTeoh/restaurant-rush-sc2002
 
 ## Contents
-[Quick start](#quick-start) · [Submission index](#submission-index) · [Base setting and reproducible runs](#base-setting-and-reproducible-runs) · [Stages and tags](#stages-and-tags) · [Diagrams](#diagrams) · [Video](#video) · [Team](#team) · [Documentation map](#documentation-map)
+[Quick start](#quick-start) · [Submission index](#submission-index) · [Base setting and reproducible runs](#base-setting-and-reproducible-runs) · [Stages and tags](#stages-and-tags) · [Diagrams](#diagrams) · [Video](#video) · [AI history](#ai-history) · [Team](#team) · [Documentation map](#documentation-map)
 
 ## Quick start
 - JDK 17 or newer (compiled with `--release 17`)
@@ -40,7 +40,7 @@ Where to find each item the brief asks for.
 | Stage tags and comparisons | [Stages and tags](#stages-and-tags) |
 | Tests and reproducible runs | [`test/`](test/), [`runs/`](runs/), [`docs/testing/test-notes.md`](docs/testing/test-notes.md) |
 | Process evidence (CI, PR template, design log, roles) | [`.github/`](.github/), [`docs/design/design-log.md`](docs/design/design-log.md), [`docs/process/team-roles.md`](docs/process/team-roles.md), the pull requests on GitHub |
-| AI history | each member's own branch; the links are in the report, Appendix E |
+| AI history | each member's own branch: [AI history](#ai-history) (also the report, Appendix F) |
 
 ## Base setting and reproducible runs
 18 turns, 2 tables, one Waiter, Chef and Cashier, customers arriving on turns 1, 4, 7, 10, 13 and 16.
@@ -88,11 +88,10 @@ All sources and images are in [`docs/uml/`](docs/uml/).
 
 | Diagram | Files |
 |---|---|
-| Class diagram, Stage 1 | [`stage-1-class-diagram.drawio`](docs/uml/stage-1-class-diagram.drawio) |
+| Class diagram, Stage 1 | [`stage-1.png`](docs/uml/stage-1.png), [`stage-1-class-diagram.drawio`](docs/uml/stage-1-class-diagram.drawio) |
 | Class diagram, Stage 2 | [`stage-2.png`](docs/uml/stage-2.png), [`stage-2-class-diagram.drawio`](docs/uml/stage-2-class-diagram.drawio) |
 | Class diagram, Stage 3 (final) | [`stage-3.png`](docs/uml/stage-3.png), [`stage-3-class-diagram.drawio`](docs/uml/stage-3-class-diagram.drawio) |
 | Sequence diagram (Figure 3-1, four parts) | [Part 1, messages 1-19](<docs/uml/Sequence Diagram-Part 1_ messages 1-19.png>), [Part 2, messages 20-51](<docs/uml/Sequence Diagram-Part 2_ messages 20-51.png>), [Part 3, messages 52-72](<docs/uml/Sequence Diagram-Part 3_ messages 52-72.png>), [Part 4, messages 73-89](<docs/uml/Sequence Diagram-Part 4_ messages 73-89.png>) |
-| Customer design (early drafts) | [class v1](docs/uml/customer-class-v1.png), [class v2](docs/uml/customer-class-v2.png), [state v1](docs/uml/customer-state-v1.png) |
 
 The sequence diagram replays the scenario in [`runs/stage3-victory-happyhour-t4.txt`](runs/stage3-victory-happyhour-t4.txt); its alternative branch is [`runs/stage3-victory-continue-t4.txt`](runs/stage3-victory-continue-t4.txt).
 
@@ -110,6 +109,17 @@ Video link: TBD (fill in before submission)
 | 7 | Stage tag comparisons and the class diagrams | Takshak | TBD |
 | 8 | Use case and sequence diagram | Sibghat | TBD |
 | 9 | Individual contributions and key learning | each member | TBD |
+
+## AI history
+Each member keeps their full AI conversation, in order and not summarised, on their own branch.
+
+| Member | Branch |
+|---|---|
+| Ian Tan | TBD (branch to be added) |
+| Robin Teoh | [`robin/ai-history`](https://github.com/RobinTeoh/restaurant-rush-sc2002/tree/robin/ai-history/ai-history) |
+| Caleb Soon | TBD (branch to be added) |
+| Takshak | [`Takshak`](https://github.com/RobinTeoh/restaurant-rush-sc2002/tree/Takshak) |
+| Sibghat Ullah | [`Sibghat-Ullah`](https://github.com/RobinTeoh/restaurant-rush-sc2002/tree/Sibghat-Ullah) |
 
 ## Team
 | Member | Role |
@@ -131,6 +141,7 @@ Who owns which folder, diagram, report section and video segment: [`docs/process
 | [`docs/design/design-principles.md`](docs/design/design-principles.md) | Where SOLID genuinely shows in the code, and where it does not |
 | [`docs/design/decision-summary.md`](docs/design/decision-summary.md) | One-page summary of every decision by stage |
 | [`docs/testing/test-notes.md`](docs/testing/test-notes.md) | Reproducible runs, edge cases and test evidence per stage |
-| [`docs/uml/`](docs/uml/) | Class diagrams, sequence diagram and customer diagrams |
+| [`docs/uml/`](docs/uml/) | The submitted class diagrams (one per stage) and the sequence diagram |
+| [`docs/design/customer-drafts/`](docs/design/customer-drafts/) | Early Customer class and state drafts, kept as design history |
 | [`docs/process/`](docs/process/) | Team roles, the original development plan, and the team manual (PDF and HTML) |
 | [`runs/`](runs/) | Recorded player inputs for every stage, replayed by the tests and CI |
