@@ -92,7 +92,6 @@ All sources and images are in [`docs/uml/`](docs/uml/).
 | Class diagram, Stage 2 | [`stage-2.png`](docs/uml/stage-2.png), [`stage-2-class-diagram.drawio`](docs/uml/stage-2-class-diagram.drawio) |
 | Class diagram, Stage 3 (final) | [`stage-3.png`](docs/uml/stage-3.png), [`stage-3-class-diagram.drawio`](docs/uml/stage-3-class-diagram.drawio) |
 | Sequence diagram (Figure 3-1, four parts) | [Part 1, messages 1-19](<docs/uml/Sequence Diagram-Part 1_ messages 1-19.png>), [Part 2, messages 20-51](<docs/uml/Sequence Diagram-Part 2_ messages 20-51.png>), [Part 3, messages 52-72](<docs/uml/Sequence Diagram-Part 3_ messages 52-72.png>), [Part 4, messages 73-89](<docs/uml/Sequence Diagram-Part 4_ messages 73-89.png>) |
-| Customer design (early drafts) | [class v1](docs/uml/customer-class-v1.png), [class v2](docs/uml/customer-class-v2.png), [state v1](docs/uml/customer-state-v1.png) |
 
 The sequence diagram replays the scenario in [`runs/stage3-victory-happyhour-t4.txt`](runs/stage3-victory-happyhour-t4.txt); its alternative branch is [`runs/stage3-victory-continue-t4.txt`](runs/stage3-victory-continue-t4.txt).
 
@@ -142,6 +141,7 @@ Who owns which folder, diagram, report section and video segment: [`docs/process
 | [`docs/design/design-principles.md`](docs/design/design-principles.md) | Where SOLID genuinely shows in the code, and where it does not |
 | [`docs/design/decision-summary.md`](docs/design/decision-summary.md) | One-page summary of every decision by stage |
 | [`docs/testing/test-notes.md`](docs/testing/test-notes.md) | Reproducible runs, edge cases and test evidence per stage |
-| [`docs/uml/`](docs/uml/) | Class diagrams, sequence diagram and customer diagrams |
+| [`docs/uml/`](docs/uml/) | The submitted class diagrams (one per stage) and the sequence diagram |
+| [`docs/design/customer-drafts/`](docs/design/customer-drafts/) | Early Customer class and state drafts, kept as design history |
 | [`docs/process/`](docs/process/) | Team roles, the original development plan, and the team manual (PDF and HTML) |
 | [`runs/`](runs/) | Recorded player inputs for every stage, replayed by the tests and CI |

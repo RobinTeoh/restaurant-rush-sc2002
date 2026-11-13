@@ -60,9 +60,9 @@ Left out on purpose, to keep the diagram readable: the data records `TurnSnapsho
 
 ## Customer class diagram (v2, Stage 1, 2026-10-16)
 
-Replaces v1 below. The code in `src/restaurant/customer/` matches it. Drawn by Robin: [uml/customer-class-v2.png](../uml/customer-class-v2.png).
+Replaces v1 below. The code in `src/restaurant/customer/` matches it. Drawn by Robin: [customer-drafts/customer-class-v2.png](customer-drafts/customer-class-v2.png).
 
-![Customer class diagram v2](../uml/customer-class-v2.png)
+![Customer class diagram v2](customer-drafts/customer-class-v2.png)
 
 - **Customer**: `- LOSS_PER_TURN: int = 8`, `- MAX_SATISFACTION: int = 100`, `- SEED: long = 32` (all static, readOnly), `- id: int {readOnly}`, `- satisfaction: int`; `+ Customer(id: int)`, `+ seat()`, `+ chooseFood(menu: Menu): MenuItem` (waiting for Ian's classes), `+ serve()`, `+ finishEating()`, `+ pay()`, `+ loseSatisfaction()`, `+ hasLeft(): boolean`, `+ getState(): CustomerState`, `+ getRecordedSatisfaction(): int`, `+ getId(): int`, `+ getSatisfaction(): int`, `- requireState(expected: CustomerState)`.
 - **CustomerState** «enumeration»: WAITING, SEATED, ORDERED, EATING, READY_TO_PAY, PAID, LEFT; `+ losesSatisfaction(): boolean`.
@@ -70,17 +70,17 @@ Replaces v1 below. The code in `src/restaurant/customer/` matches it. Drawn by R
 
 ## Customer class diagram (v1, Stage 1)
 
-Drawn by Robin on 2026-10-15: [uml/customer-class-v1.png](../uml/customer-class-v1.png). Stage 1 only: one ordinary `Customer` class, the `CustomerState` enum, and Ian's `Menu`/`MenuItem` (only used by `chooseFood`).
+Drawn by Robin on 2026-10-15: [customer-drafts/customer-class-v1.png](customer-drafts/customer-class-v1.png). Stage 1 only: one ordinary `Customer` class, the `CustomerState` enum, and Ian's `Menu`/`MenuItem` (only used by `chooseFood`).
 
 Pending team answers (see "Open questions" above): whether `tableNo`/`getTable()` and `chosenFood`/`getChosenItem()` are needed, how the eating rule is timed (`finishEating()`), and whether the Cashier calls `pay()` or `recordSatisfactionAtPayment()`.
 
-![Customer class diagram v1](../uml/customer-class-v1.png)
+![Customer class diagram v1](customer-drafts/customer-class-v1.png)
 
 ## Customer state machine (draft v1, Stage 1)
 
-Hand-drawn by Robin on 2026-10-13: [uml/customer-state-v1.png](../uml/customer-state-v1.png). The first sketch wrongly had a PAID → LEFT arrow; it was removed (LEFT means "left unhappy without paying" and is counted as an unhappy departure in brief §3.5). The text version below is the same diagram.
+Hand-drawn by Robin on 2026-10-13: [customer-drafts/customer-state-v1.png](customer-drafts/customer-state-v1.png). The first sketch wrongly had a PAID → LEFT arrow; it was removed (LEFT means "left unhappy without paying" and is counted as an unhappy departure in brief §3.5). The text version below is the same diagram.
 
-![Customer state machine v1](../uml/customer-state-v1.png)
+![Customer state machine v1](customer-drafts/customer-state-v1.png)
 
 ```mermaid
 stateDiagram-v2
