@@ -3,6 +3,8 @@
 SC2002 group assignment (SCEE GRP 5): a turn-based restaurant management game in Java, played in the console.
 You are the manager. Staff time is limited, so you decide which customers and orders come first. The game was built in three tagged, independently runnable stages.
 
+<p align="center"><img src="docs/images/restaurant-rush-banner.png" alt="Restaurant Rush: a Java-based simulation" width="720"></p>
+
 **Repository:** https://github.com/RobinTeoh/restaurant-rush-sc2002
 
 ## Contents
@@ -28,7 +30,7 @@ Where to find each item the brief asks for.
 | Item | Where |
 |---|---|
 | Source code, build and run instructions | [`src/`](src/), [`test/`](test/), [Quick start](#quick-start) |
-| README (repository URL, stage comparisons, video timestamps) | this file: [Stages and tags](#stages-and-tags), [Video](#video) |
+| README (repository URL, stage links, video timestamps) | this file: [Stages and tags](#stages-and-tags), [Video](#video) |
 | PDF report | submitted in the archive: diagrams, design discussion, functional evidence, reflections |
 | Recorded video | [Video](#video) |
 | Declarations (Original Work, use of GAI) | signed forms, submitted in the archive |
@@ -79,68 +81,7 @@ What each run does, the edge cases and the test evidence: [docs/testing/test-not
 
 Each tag builds and runs on its own: `git checkout stage-N`, build, then run.
 
-The file paths in the two comparison sections below are as they were at each tag. After `stage-3` the documentation was reorganised under `docs/` (no source, test or run file moved).
-
-### Stage 1 → Stage 2
-Compare: https://github.com/RobinTeoh/restaurant-rush-sc2002/compare/stage-1...stage-2
-
-**New files**
-
-| File | Why |
-|---|---|
-| `customer/RegularCustomer.java` | Stage 1's customer behaviour as its own type (loses 8) |
-| `customer/VIPCustomer.java` | Loses 5 per waiting turn, 10% off the bill (brief 4.2) |
-| `customer/CriticCustomer.java` | Loses 12 per waiting turn, always orders the most expensive dish (D7) |
-| `test/.../customer/CustomerTypesTest.java`, `CustomerSubstitutionTest.java` | What differs per type; every type follows the same flow through a `Customer` reference |
-| `test/.../control/ArrivalScheduleTest.java`, `BaseSettingTest.java` | Who arrives when; the Stage 2 base setting (types, dishes, bills, $45 still reachable) |
-| `runs/stage2-*.txt` | Reproducible Stage 2 victory and defeat runs |
-
-**Changed files, and why**
-
-| File | Change | Why |
-|---|---|---|
-| `customer/Customer.java` | Now **abstract**. The constant loss of 8 became `satisfactionLossPerTurn()`, overridden by each type. The dish choice moved from `chooseFood` into `pickDish()`, which the Critic overrides. Added `getDiscountPercent()` (0 by default) and `getTypeName()`. The event methods are now `final`. | Stage 1 had one kind of customer, so it was one class (designed from Stage 1 only). With three types, the shared state rules stay in one parent and each type only supplies its own numbers and food choice. `final` stops a type from breaking the visit flow. |
-| `control/ArrivalSchedule.java` | Holds the customer for each arrival; `arrivalsOn(turn)` returns those customers instead of a count. The turns-only constructor still means all Regular. | Decides which type arrives without the controller knowing any customer class (no type checks, brief 4.2). Keeping the turns-only form lets the Stage 1 tests run unchanged. |
-| `control/GameController.java` | `arrivals()` adds whoever the schedule says arrives (3 lines); the unused id counter is gone. Labels and the display show each customer's type. | `Customer` can no longer be created directly. Showing the type lets the player make VIP and Critic choices. |
-| `control/GameConfig.java`, `app/Main.java` | `GameConfig.baseCustomers()` returns the Stage 2 base setting; `Main` uses it. | One place for the base setting (D6b). New objects every call, so each game starts fresh. |
-| `control/TurnSnapshot.java`, `boundary/ConsoleUI.java` | Customer lines carry and print the type. | Display only. |
-| `pricing/Money.java` | Added `percentOff(cents, percent)` with D1's half-up rounding. | The only place a percentage is applied; Stage 3's Happy Hour reuses it. |
-| `order/Order.java` | `getBill()` takes off the customer's own discount. | VIP 10% off. No type check: each customer reports its own discount. |
-| Existing tests | `new Customer(...)` became `new RegularCustomer(...)` (42 places in 7 test files); nothing else changed. | `Customer` is abstract. All 74 Stage 1 tests still pass, which shows Stage 1 behaviour is unchanged. |
-| `.github/workflows/ci.yml` | `STAGE` set to 2. | CI replays the Stage 2 run files. |
-
-**Deleted:** nothing.
-
-### Stage 2 → Stage 3
-Compare: https://github.com/RobinTeoh/restaurant-rush-sc2002/compare/stage-2...stage-3
-
-**New files**
-
-| File | Why |
-|---|---|
-| `staff/Host.java` | Seats the first queued customer at a free table, at most once per turn, automatically before the Waiter (D4, brief 4.3) |
-| `menu/ComboMeal.java` | A `MenuItem` made of two existing items: units added up, price 90% of the pair rounded half-up (brief 4.3) |
-| `pricing/HappyHour.java` | Once per game, lasts two turns, 20% off, +15 recovery for waiting customers, counts its own turns |
-| `test/.../HostTest`, `ComboMealTest`, `HappyHourTest`, `GameConfigTest` | Host rules, combo units and price, Happy Hour rules, the Stage 3 setting |
-| `runs/stage3-victory.txt`, `runs/stage3-defeat.txt` | Reproducible Stage 3 victory and defeat runs |
-
-**Changed files, and why**
-
-| File | Change | Why |
-|---|---|---|
-| `menu/Menu.java` | Added `withCombos()`: the three dishes, then Salad + Burger, Salad + Pasta, Burger + Pasta. | The combo-choice rule (D8) needs the combos on the menu. Customers pick from the menu as before, so no customer class changed for it. |
-| `order/Order.java` | `createOrder(customer, item, turn, happyHour)` works out the bill when the order is taken and stores it: VIP discount first, then Happy Hour. The old `createOrder` still works. | Happy Hour may be over by the time the customer pays, so the price must be locked at order time (brief 4.3). Stages 1 and 2 still call the old method. |
-| `customer/Customer.java` | Added `recover(points)`: only WAITING, SEATED and ORDERED customers gain, capped at 100. | Keeps the state rule inside the customer. `HappyHour` only says how many points. |
-| `staff/Waiter.java` | `takeOrder` passes the Happy Hour to `Order.createOrder`. | So orders taken during Happy Hour get the lower price. |
-| `control/GameController.java` | Two switches (`hostEnabled`, a `HappyHour` that may be null). Each turn: Happy Hour prompt and +15 recovery, then the Host, then the Waiter; `endTurn()` at turn end. The screen shows Happy Hour status and turns left. | Wires the new role and policy into the six steps without touching Stage 1 and 2 rules. With both switched off the turn is the same as Stage 2. |
-| `control/GameConfig.java`, `app/Main.java` | Scenario `stage1`, `stage2` or `stage3` picks the arrivals, menu, Host and Happy Hour. | One place for each stage's setting; the default is now Stage 3, so a plain `run` plays the latest stage. |
-| `control/TurnSnapshot.java`, `boundary/ConsoleUI.java` | Carry and print the Happy Hour line. | Display only. |
-| `run.sh`, `run.bat` | Accept the scenario argument. | Replay `stage3` run files. |
-| `CONTRACT.md`, `DECISIONS.md`, `docs/` | Stage 3 contract, D8 and D9, design-log rows. | Record the decisions. |
-| `.github/workflows/ci.yml` | `STAGE` set to 3; CI replays the run files of every stage so far. | Proves Stage 1 and 2 behaviour still works. |
-| Existing tests | Only added to (new tests in `CustomerTest`, `OrderTest`, `MenuTest`, `GameControllerTest`). | 151 tests pass; the 102 from Stage 2 are unchanged. |
-
-**Deleted:** nothing.
+What changed between stages, file by file and why: the report, Section 5 (Stage evolution), or the compare links above.
 
 ## Diagrams
 All sources and images are in [`docs/uml/`](docs/uml/).
