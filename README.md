@@ -8,7 +8,7 @@ You are the manager. Staff time is limited, so you decide which customers and or
 **Repository:** https://github.com/RobinTeoh/restaurant-rush-sc2002
 
 ## Contents
-[Quick start](#quick-start) · [Submission index](#submission-index) · [Base setting and reproducible runs](#base-setting-and-reproducible-runs) · [Stages and tags](#stages-and-tags) · [Diagrams](#diagrams) · [Video](#video) · [Team](#team) · [Documentation map](#documentation-map)
+[Quick start](#quick-start) · [Submission index](#submission-index) · [Base setting and reproducible runs](#base-setting-and-reproducible-runs) · [Stages and tags](#stages-and-tags) · [Diagrams](#diagrams) · [Video](#video) · [AI history](#ai-history) · [Team](#team) · [Documentation map](#documentation-map)
 
 ## Quick start
 - JDK 17 or newer (compiled with `--release 17`)
@@ -40,7 +40,7 @@ Where to find each item the brief asks for.
 | Stage tags and comparisons | [Stages and tags](#stages-and-tags) |
 | Tests and reproducible runs | [`test/`](test/), [`runs/`](runs/), [`docs/testing/test-notes.md`](docs/testing/test-notes.md) |
 | Process evidence (CI, PR template, design log, roles) | [`.github/`](.github/), [`docs/design/design-log.md`](docs/design/design-log.md), [`docs/process/team-roles.md`](docs/process/team-roles.md), the pull requests on GitHub |
-| AI history | each member's own branch; the links are in the report, Appendix E |
+| AI history | each member's own branch: [AI history](#ai-history) (also the report, Appendix F) |
 
 ## Base setting and reproducible runs
 18 turns, 2 tables, one Waiter, Chef and Cashier, customers arriving on turns 1, 4, 7, 10, 13 and 16.
@@ -110,6 +110,17 @@ Video link: TBD (fill in before submission)
 | 7 | Stage tag comparisons and the class diagrams | Takshak | TBD |
 | 8 | Use case and sequence diagram | Sibghat | TBD |
 | 9 | Individual contributions and key learning | each member | TBD |
+
+## AI history
+Each member keeps their full AI conversation, in order and not summarised, on their own branch.
+
+| Member | Branch |
+|---|---|
+| Ian Tan | TBD (branch to be added) |
+| Robin Teoh | [`robin/ai-history`](https://github.com/RobinTeoh/restaurant-rush-sc2002/tree/robin/ai-history/ai-history) |
+| Caleb Soon | TBD (branch to be added) |
+| Takshak | [`Takshak`](https://github.com/RobinTeoh/restaurant-rush-sc2002/tree/Takshak) |
+| Sibghat Ullah | [`Sibghat-Ullah`](https://github.com/RobinTeoh/restaurant-rush-sc2002/tree/Sibghat-Ullah) |
 
 ## Team
 | Member | Role |
