@@ -141,7 +141,7 @@ All sources and images are in [`docs/uml/`](docs/uml/).
 The sequence diagram replays the scenario in [`runs/stage3-victory-happyhour-t4.txt`](runs/stage3-victory-happyhour-t4.txt); its alternative branch is [`runs/stage3-victory-continue-t4.txt`](runs/stage3-victory-continue-t4.txt).
 
 ## Video
-**Video link:** https://youtu.be/XInMKYZXef4 (unlisted on YouTube; opens without logging in; total length 14:43)
+**Video link:** https://youtu.be/XInMKYZXef4
 
 Each start time below opens the video at that segment.
 
