@@ -31,16 +31,16 @@ Where to find each item the brief asks for.
 |---|---|
 | Source code, build and run instructions | [`src/`](src/), [`test/`](test/), [Quick start](#quick-start) |
 | README (repository URL, stage links, per-transition file lists, video timestamps) | this file: [Stages and tags](#stages-and-tags) (Stage 1 → 2 and 2 → 3), [Video](#video) |
-| PDF report | [`docs/report/SC2002-Restaurant-Rush-Report.pdf`](docs/report/SC2002-Restaurant-Rush-Report.pdf) (also in the submitted archive): diagrams, design discussion, functional evidence, reflections |
+| PDF report | [`docs/report/SC2002-Restaurant-Rush-Report.pdf`](docs/report/SC2002-Restaurant-Rush-Report.pdf)  |
 | Recorded video (about 15 minutes, with segment timestamps) | [Video](#video): https://youtu.be/XInMKYZXef4 |
-| Declarations (Original Work, use of GAI) | signed forms, submitted in the archive |
+| Declarations (Use of GAI) | [AI history](#ai-history) |
 | Class diagrams (one per stage) | [Diagrams](#diagrams) |
 | Sequence diagram (one scenario: VIP, Happy Hour, Combo at turn 4) | [Diagrams](#diagrams) |
 | Design discussion (decisions, principles, alternatives) | [`docs/design/`](docs/design/) |
 | Stage tags and comparisons | [Stages and tags](#stages-and-tags) |
 | Tests and reproducible runs | [`test/`](test/), [`runs/`](runs/), [`docs/testing/test-notes.md`](docs/testing/test-notes.md) |
 | Process evidence (CI, PR template, design log, roles) | [`.github/`](.github/), [`docs/design/design-log.md`](docs/design/design-log.md), [`docs/process/team-roles.md`](docs/process/team-roles.md), the pull requests on GitHub |
-| AI history | each member's own branch: [AI history](#ai-history) (also the report, Appendix F) |
+| AI history | each member's own branch: [AI history](#ai-history) |
 
 ## Base setting and reproducible runs
 18 turns, 2 tables, one Waiter, Chef and Cashier, customers arriving on turns 1, 4, 7, 10, 13 and 16.
