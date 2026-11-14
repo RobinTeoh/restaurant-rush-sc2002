@@ -135,7 +135,7 @@ Customers 1 to 6 order (seed 32, D8): Salad + Burger ($21.60), Salad + Pasta ($2
 | `runs/stage3-victory.txt` | Same Waiter priority as Stage 1 (serve, then take orders, then seat); the Host seats automatically; Happy Hour is switched on at the start of turn 7, so customer 3's Pasta is locked at $14.40. | **VICTORY** | 4 | $87.57 | 80.0 | 0 |
 | `runs/stage3-victory-happyhour-t4.txt` | The report's Section 3 scenario, Happy Hour branch: at the start of turn 4 the manager starts Happy Hour (option 2) and customer 2 (VIP, Salad + Pasta) is locked at $17.50. Otherwise the same play as the first run. | **VICTORY** | 4 | $86.80 | 75.5 | 0 |
 | `runs/stage3-victory-continue-t4.txt` | The same scenario, other branch: identical input except line 12 (turn 4 Happy Hour prompt), where the manager continues (option 1). Customer 2 pays $21.87. | **VICTORY** | 4 | $91.17 | 74.3 | 0 |
-| `runs/stage3-defeat.txt` | The Chef is never given an order. The Host seats customers 1 and 2, but nothing is cooked. | **DEFEAT** | 0 | $0.00 | N/A | 2 |
+| `runs/stage3-defeat.txt` | The Waiter always waits, so no order is ever taken and the Chef has nothing to cook. The Host seats customers 1 and 2, but nobody is served. | **DEFEAT** | 0 | $0.00 | N/A | 2 |
 
 The two `-t4` runs differ only in the turn 4 Happy Hour prompt, so they show what that one choice is worth. Starting Happy Hour restores customer 2's satisfaction on turn 5 (95 back to 100), so it pays at satisfaction 90 instead of 85 (average 75.5 against 74.3), but its 20% discount costs $4.37 of revenue ($86.80 against $91.17). Both branches win. Section 3 of the report walks through the Happy Hour branch message by message.
 
