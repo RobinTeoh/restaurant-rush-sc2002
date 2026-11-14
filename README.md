@@ -32,7 +32,7 @@ Where to find each item the brief asks for.
 | Source code, build and run instructions | [`src/`](src/), [`test/`](test/), [Quick start](#quick-start) |
 | README (repository URL, stage links, per-transition file lists, video timestamps) | this file: [Stages and tags](#stages-and-tags) (Stage 1 → 2 and 2 → 3), [Video](#video) |
 | PDF report | submitted in the archive: diagrams, design discussion, functional evidence, reflections |
-| Recorded video | [Video](#video) |
+| Recorded video (about 15 minutes, with segment timestamps) | [Video](#video): https://youtu.be/XInMKYZXef4 |
 | Declarations (Original Work, use of GAI) | signed forms, submitted in the archive |
 | Class diagrams (one per stage) | [Diagrams](#diagrams) |
 | Sequence diagram (one scenario: VIP, Happy Hour, Combo at turn 4) | [Diagrams](#diagrams) |
@@ -57,7 +57,7 @@ The Stage 2 customers order Salad, Burger, Pasta, Pasta (the Critic), Pasta, Sal
 | `runs/stage3-victory.txt` (`stage-3`) | VICTORY: 4 paid, $87.57, average 80.0 (Happy Hour switched on in turn 7) |
 | `runs/stage3-victory-happyhour-t4.txt` (`main`) | VICTORY: 4 paid, $86.80, average 75.5 (the report's Section 3 scenario: Happy Hour started at turn 4) |
 | `runs/stage3-victory-continue-t4.txt` (`main`) | VICTORY: 4 paid, $91.17, average 74.3 (the same scenario, continuing at turn 4 without Happy Hour) |
-| `runs/stage3-defeat.txt` (`stage-3`) | DEFEAT: the Chef is never given an order, so nobody is served |
+| `runs/stage3-defeat.txt` (`stage-3`) | DEFEAT: the Waiter always waits, so no order is taken and nobody is served |
 | `runs/stage2-victory.txt` (`stage-2`) | VICTORY: 4 paid, $58.50, average 75.5 |
 | `runs/stage2-victory-5paid.txt` (`stage-2`) | VICTORY: 5 paid, $76.50, average 73.2 (the most that can pay) |
 | `runs/stage2-defeat.txt` (`stage-2`) | DEFEAT: the Chef is never given an order, so nobody is served |
@@ -73,11 +73,11 @@ The two `-t4` run files were added after the `stage-3` tag (for the report's Sec
 What each run does, the edge cases and the test evidence: [docs/testing/test-notes.md](docs/testing/test-notes.md).
 
 ## Stages and tags
-| Stage | Tag | Commit | Adds | Compare |
+| Stage | Tag (browse the code) | Commit | Adds | Compare |
 |---|---|---|---|---|
-| 1 | `stage-1` | `14f368c` | Regular customers, menu, Waiter, Chef, Cashier, full turn sequence, both endings | first stage |
-| 2 | `stage-2` | `68d2336` | VIP and Critic customers | [stage-1...stage-2](https://github.com/RobinTeoh/restaurant-rush-sc2002/compare/stage-1...stage-2) |
-| 3 | `stage-3` | `e6ccf01` | Host, ComboMeal, Happy Hour | [stage-2...stage-3](https://github.com/RobinTeoh/restaurant-rush-sc2002/compare/stage-2...stage-3) |
+| 1 | [`stage-1`](https://github.com/RobinTeoh/restaurant-rush-sc2002/tree/stage-1) | `14f368c` | Regular customers, menu, Waiter, Chef, Cashier, full turn sequence, both endings | first stage |
+| 2 | [`stage-2`](https://github.com/RobinTeoh/restaurant-rush-sc2002/tree/stage-2) | `68d2336` | VIP and Critic customers | [stage-1...stage-2](https://github.com/RobinTeoh/restaurant-rush-sc2002/compare/stage-1...stage-2) |
+| 3 | [`stage-3`](https://github.com/RobinTeoh/restaurant-rush-sc2002/tree/stage-3) | `e6ccf01` | Host, ComboMeal, Happy Hour | [stage-2...stage-3](https://github.com/RobinTeoh/restaurant-rush-sc2002/compare/stage-2...stage-3) |
 
 Each tag builds and runs on its own: `git checkout stage-N`, build, then run.
 
@@ -141,19 +141,23 @@ All sources and images are in [`docs/uml/`](docs/uml/).
 The sequence diagram replays the scenario in [`runs/stage3-victory-happyhour-t4.txt`](runs/stage3-victory-happyhour-t4.txt); its alternative branch is [`runs/stage3-victory-continue-t4.txt`](runs/stage3-victory-continue-t4.txt).
 
 ## Video
-Video link: TBD (fill in before submission)
+**Video link:** https://youtu.be/XInMKYZXef4 (unlisted on YouTube; opens without logging in; total length 14:43)
+
+Each start time below opens the video at that segment.
 
 | # | Segment | Speaker | Start |
 |---|---|---|---|
-| 1 | Game launch from the submitted project, and an overview of the three stages | Caleb | TBD |
-| 2 | Meaningful manager choices, including a decision where staff are constrained | Caleb | TBD |
-| 3 | A dish going READY, then SERVED, then paid | Robin | TBD |
-| 4 | A VIP or Critic behaviour | Robin | TBD |
-| 5 | A Stage 3 feature | Ian | TBD |
-| 6 | One victory and one defeat (separate reproducible runs) | Ian | TBD |
-| 7 | Stage tag comparisons and the class diagrams | Takshak | TBD |
-| 8 | Use case and sequence diagram | Sibghat | TBD |
-| 9 | Individual contributions and key learning | each member | TBD |
+| 1 | Game launch from the submitted project, and an overview of the three stages | Caleb | [0:10](https://youtu.be/XInMKYZXef4?t=10) |
+| 2 | Meaningful manager choices, including a decision where staff are constrained | Caleb | [1:03](https://youtu.be/XInMKYZXef4?t=63) |
+| 3 | A dish going READY, then SERVED, then paid | Robin | [1:43](https://youtu.be/XInMKYZXef4?t=103) |
+| 4 | A VIP or Critic behaviour | Robin | [3:01](https://youtu.be/XInMKYZXef4?t=181) |
+| 5 | A Stage 3 feature | Ian | [4:32](https://youtu.be/XInMKYZXef4?t=272) |
+| 6 | One victory and one defeat (separate reproducible runs) | Ian | [5:26](https://youtu.be/XInMKYZXef4?t=326) |
+| 7 | Stage tag comparisons and the class diagrams | Takshak | [6:17](https://youtu.be/XInMKYZXef4?t=377) |
+| 8 | Use case and sequence diagram | Sibghat | [9:11](https://youtu.be/XInMKYZXef4?t=551) |
+| 9 | Individual contributions and key learning | each member | [12:38](https://youtu.be/XInMKYZXef4?t=758) |
+
+Segment 9 in detail: Caleb [12:40](https://youtu.be/XInMKYZXef4?t=760), Robin [13:01](https://youtu.be/XInMKYZXef4?t=781), Ian [13:24](https://youtu.be/XInMKYZXef4?t=804), Takshak [13:44](https://youtu.be/XInMKYZXef4?t=824), Sibghat [14:13](https://youtu.be/XInMKYZXef4?t=853). The video starts with a 10-second intro and ends with a thank-you card at 14:40.
 
 ## AI history
 Each member keeps their full AI conversation, in order and not summarised, on their own branch.
