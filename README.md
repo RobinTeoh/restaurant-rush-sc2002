@@ -31,7 +31,7 @@ Where to find each item the brief asks for.
 |---|---|
 | Source code, build and run instructions | [`src/`](src/), [`test/`](test/), [Quick start](#quick-start) |
 | README (repository URL, stage links, per-transition file lists, video timestamps) | this file: [Stages and tags](#stages-and-tags) (Stage 1 → 2 and 2 → 3), [Video](#video) |
-| PDF report | submitted in the archive: diagrams, design discussion, functional evidence, reflections |
+| PDF report | [`docs/report/SC2002-Restaurant-Rush-Report.pdf`](docs/report/SC2002-Restaurant-Rush-Report.pdf) (also in the submitted archive): diagrams, design discussion, functional evidence, reflections |
 | Recorded video (about 15 minutes, with segment timestamps) | [Video](#video): https://youtu.be/XInMKYZXef4 |
 | Declarations (Original Work, use of GAI) | signed forms, submitted in the archive |
 | Class diagrams (one per stage) | [Diagrams](#diagrams) |
@@ -192,5 +192,6 @@ Who owns which folder, diagram, report section and video segment: [`docs/process
 | [`docs/testing/test-notes.md`](docs/testing/test-notes.md) | Reproducible runs, edge cases and test evidence per stage |
 | [`docs/uml/`](docs/uml/) | The submitted class diagrams (one per stage) and the sequence diagram |
 | [`docs/design/customer-drafts/`](docs/design/customer-drafts/) | Early Customer class and state drafts, kept as design history |
+| [`docs/report/`](docs/report/) | The final group report (PDF), the same file as in the submitted archive |
 | [`docs/process/`](docs/process/) | Team roles, the original development plan, and the team manual (PDF and HTML) |
 | [`runs/`](runs/) | Recorded player inputs for every stage, replayed by the tests and CI |
