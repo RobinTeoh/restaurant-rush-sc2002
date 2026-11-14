@@ -30,7 +30,7 @@ Where to find each item the brief asks for.
 | Item | Where |
 |---|---|
 | Source code, build and run instructions | [`src/`](src/), [`test/`](test/), [Quick start](#quick-start) |
-| README (repository URL, stage links, video timestamps) | this file: [Stages and tags](#stages-and-tags), [Video](#video) |
+| README (repository URL, stage links, per-transition file lists, video timestamps) | this file: [Stages and tags](#stages-and-tags) (Stage 1 → 2 and 2 → 3), [Video](#video) |
 | PDF report | submitted in the archive: diagrams, design discussion, functional evidence, reflections |
 | Recorded video | [Video](#video) |
 | Declarations (Original Work, use of GAI) | signed forms, submitted in the archive |
@@ -50,7 +50,7 @@ Victory needs at least 4 paid customers, at least $45.00 revenue and an average 
 VIP loses 5 satisfaction per waiting turn and gets 10% off; Critic loses 12 and always orders the most expensive dish; Regular loses 8.
 
 **How customers choose food:** customer *n* (1 to 6, in arrival order) picks a dish with `new Random(32 + n)`, so every run is the same.
-The customers order Salad, Burger, Pasta, Pasta (the Critic), Pasta, Salad. Details: [DECISIONS.md](docs/design/DECISIONS.md) D5, D6, D6b and D7.
+The Stage 2 customers order Salad, Burger, Pasta, Pasta (the Critic), Pasta, Salad. In Stage 3 the menu also has three combos, and the six customers order Salad + Burger, Salad + Pasta, Pasta, Burger + Pasta (the Critic), Burger + Pasta, Salad (D8). Details: [DECISIONS.md](docs/design/DECISIONS.md) D5, D6, D6b and D7.
 
 | Run file (replay at tag) | Result |
 |---|---|
@@ -81,7 +81,52 @@ What each run does, the edge cases and the test evidence: [docs/testing/test-not
 
 Each tag builds and runs on its own: `git checkout stage-N`, build, then run.
 
-What changed between stages, file by file and why: the report, Section 5 (Stage evolution), or the compare links above.
+### Stage 1 → Stage 2
+Compare: [stage-1...stage-2](https://github.com/RobinTeoh/restaurant-rush-sc2002/compare/stage-1...stage-2) (36 files, no file deleted). The design effect, with the reasoning, is in the report, Section 5.2.
+
+| File | New / changed | Reason |
+|---|---|---|
+| `customer/RegularCustomer.java` | New | Keeps the Stage 1 behaviour (loses 8 per waiting turn) as its own type |
+| `customer/VIPCustomer.java` | New | Loses 5 per waiting turn, 10% off the bill (brief 4.2) |
+| `customer/CriticCustomer.java` | New | Loses 12 per waiting turn, always orders the most expensive dish (D7) |
+| `customer/Customer.java` | Changed | Now abstract: final event methods keep the state rules in one place, and subtypes override `satisfactionLossPerTurn()`, `getDiscountPercent()` and `pickDish()` |
+| `control/ArrivalSchedule.java` | Changed | The schedule decides which customer type arrives, so the controller needs no customer class; `arrivalsOn(turn)` now returns customers |
+| `control/GameController.java` | Changed | Adds whoever the schedule returns, with no type checks (D15); labels show the type |
+| `order/Order.java`, `pricing/Money.java` | Changed | The bill uses the customer's own discount through the new `Money.percentOff` (half-up rounding, D1) |
+| `control/GameConfig.java`, `app/Main.java`, `control/TurnSnapshot.java`, `boundary/ConsoleUI.java` | Changed | Stage 2 base setting in one place (D6b); the customer type is shown on screen |
+| `runs/stage2-*.txt` (3 files) | New | One Stage 2 victory, a 5-paid victory and a defeat |
+| `.github/workflows/ci.yml` | Changed | CI replays the Stage 2 run files too |
+| `docs/uml/stage-1-class-diagram.drawio`, `stage-2-class-diagram.drawio` | New | Class diagram sources for Stages 1 and 2 |
+| `CONTRACT.md`, `DECISIONS.md`, `README.md`, `docs/design-log.md`, `docs/test-notes.md` | Changed | Documentation for Stage 2 (these files moved into `docs/` after the tag) |
+| `test/` (13 files added or changed, e.g. `CustomerTypesTest`, `CustomerSubstitutionTest`, `BaseSettingTest`) | New / changed | Customer is abstract, so tests create `RegularCustomer`; each new rule has tests (74 → 102) |
+
+What still works: all Stage 1 rules are unchanged; the Stage 1 run files still replay at `stage-1`, and CI replays them on each push.
+
+### Stage 2 → Stage 3
+Compare: [stage-2...stage-3](https://github.com/RobinTeoh/restaurant-rush-sc2002/compare/stage-2...stage-3) (38 files, no file deleted). The design effect, with the reasoning, is in the report, Section 5.3.
+
+| File | New / changed | Reason |
+|---|---|---|
+| `staff/Host.java` | New | Seats the first queued customer at a free table, at most once per turn, before the Waiter (D4, brief 4.3) |
+| `menu/ComboMeal.java` | New | Two dishes sold together: prep units added, 90% of the pair, rounded half-up (extends `MenuItem`) |
+| `pricing/HappyHour.java` | New | Once per game, two turns, 20% off orders taken, +15 recovery for waiting customers |
+| `menu/Menu.java` | Changed | `withCombos()` lists the three dishes, then the three combos (D8) |
+| `order/Order.java` | Changed | `createOrder(..., happyHour)` locks the bill when the order is taken: VIP discount first, then Happy Hour; the old `createOrder` is kept |
+| `customer/Customer.java` | Changed | Adds `recover(points)`: only waiting customers gain, capped at 100 |
+| `staff/Waiter.java` | Changed | `takeOrder` passes Happy Hour on to `Order.createOrder` |
+| `control/GameController.java` | Changed | Each turn: Happy Hour prompt and recovery, then Host, then Waiter; Happy Hour ends at turn end |
+| `control/GameConfig.java`, `app/Main.java` | Changed | The scenario (`stage1`, `stage2`, `stage3`) picks arrivals, menu, Host and Happy Hour; the default is now Stage 3 |
+| `control/TurnSnapshot.java`, `boundary/ConsoleUI.java` | Changed | Show the Happy Hour status and turns left (display only) |
+| `run.sh`, `run.bat`, `.github/workflows/ci.yml` | Changed | Accept the scenario name; CI replays the run files of every stage |
+| `runs/stage3-victory.txt`, `runs/stage3-defeat.txt` | New | Stage 3 victory and defeat |
+| `docs/uml/stage-3-class-diagram.drawio`, `stage-3.png`, `stage-2.png` | New | Stage 3 class diagram, and the Stage 2 diagram redrawn in lecture notation |
+| `docs/design-principles.md`, `docs/decision-summary.md` | New | SOLID evidence checked against the code, and the decisions by stage |
+| `CONTRACT.md`, `DECISIONS.md`, `README.md`, `docs/design-log.md`, `docs/test-notes.md` | Changed | Documentation for Stage 3 |
+| `test/` (`HostTest`, `ComboMealTest`, `HappyHourTest`, `GameConfigTest`, `Stage3BaseSettingTest`, and additions to existing tests) | New / changed | Each Stage 3 rule has tests; 49 tests added (102 → 151), none removed |
+
+What still works: all 102 Stage 2 tests pass unchanged; the Stage 1 and Stage 2 run files replay at their own scenario with the same results; with Host and Happy Hour switched off the turn is exactly Stage 2.
+
+The full explanation of each change (what it did to the design) is in the report: Section 5 (Stage evolution).
 
 ## Diagrams
 All sources and images are in [`docs/uml/`](docs/uml/).
@@ -115,11 +160,11 @@ Each member keeps their full AI conversation, in order and not summarised, on th
 
 | Member | Branch |
 |---|---|
-| Ian Tan | [IanTan](https://github.com/RobinTeoh/restaurant-rush-sc2002/tree/ian/ai-history/ai-history)|
+| Ian Tan | [`ian/ai-history`](https://github.com/RobinTeoh/restaurant-rush-sc2002/tree/ian/ai-history/ai-history) |
 | Robin Teoh | [`robin/ai-history`](https://github.com/RobinTeoh/restaurant-rush-sc2002/tree/robin/ai-history/ai-history) |
-| Caleb Soon | TBD (branch to be added) |
+| Caleb Soon | [`caleb/ai-history`](https://github.com/RobinTeoh/restaurant-rush-sc2002/tree/caleb/ai-history/ai-history) |
 | Takshak | [`Takshak`](https://github.com/RobinTeoh/restaurant-rush-sc2002/tree/Takshak) |
-| Sibghat Ullah | [`Sibghat-Ullah`](https://github.com/RobinTeoh/restaurant-rush-sc2002/tree/24ca4c429d3f8455f218cb5f693759146c74345c/ai-chat%20history) |
+| Sibghat Ullah | [`Sibghat-Ullah`](https://github.com/RobinTeoh/restaurant-rush-sc2002/tree/Sibghat-Ullah/ai-chat%20history) |
 
 ## Team
 | Member | Role |
