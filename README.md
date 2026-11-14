@@ -119,7 +119,7 @@ Each member keeps their full AI conversation, in order and not summarised, on th
 | Robin Teoh | [`robin/ai-history`](https://github.com/RobinTeoh/restaurant-rush-sc2002/tree/robin/ai-history/ai-history) |
 | Caleb Soon | TBD (branch to be added) |
 | Takshak | [`Takshak`](https://github.com/RobinTeoh/restaurant-rush-sc2002/tree/Takshak) |
-| Sibghat Ullah | [`Sibghat-Ullah`]((https://github.com/RobinTeoh/restaurant-rush-sc2002/tree/24ca4c429d3f8455f218cb5f693759146c74345c/ai-chat%20history)) |
+| Sibghat Ullah | [`Sibghat-Ullah`](https://github.com/RobinTeoh/restaurant-rush-sc2002/tree/24ca4c429d3f8455f218cb5f693759146c74345c/ai-chat%20history) |
 
 ## Team
 | Member | Role |
