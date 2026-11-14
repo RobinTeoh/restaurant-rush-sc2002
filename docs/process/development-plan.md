@@ -1,11 +1,14 @@
 # Restaurant Rush: development plan
 
+> **Historical document.** This is the plan we wrote at the start of the project. Paths below are as planned on day one: `DECISIONS.md`, `CONTRACT.md`, the design log, the principles notes and the test notes now live under [docs/design/](../design/) and [docs/testing/](../testing/). What was actually built and tested is recorded in the [README](../../README.md) and the report.
+
 Roles (from [team-roles.md](team-roles.md)):
 **A = Customers (Robin)**, **B = Kitchen, Menu & Pricing, incl. all of Happy Hour (Ian)**, **C = Game loop, Staff & CLI (Caleb)**.
+Diagrams: **Takshak = class diagrams**, **Sibghat = sequence diagram**. The two work together and review each other's diagram (see Week 3, step 5).
 
 The plan assumes **4 weeks**. If your deadline is shorter, squeeze each week proportionally, but keep the order: the tags must happen in sequence.
 
-> **Status:** first meeting held 12 Oct 2026. Decisions recorded in [DECISIONS.md](../DECISIONS.md).
+> **Status:** first meeting held 12 Oct 2026. Decisions recorded in [DECISIONS.md](../design/DECISIONS.md).
 > Lines marked **➕ Addition** were added after the meeting to protect rubric marks; everything else is the plan as agreed.
 
 ---
@@ -112,7 +115,7 @@ Everyone writes **fake versions** of the other people's classes (in their own te
    git push origin stage-1
    ```
 7. **Clone the tag fresh into a new folder and run it** to prove it compiles on its own.
-8. ➕ **Addition (A):** commit a Stage 1 class diagram snapshot, `docs/uml/stage-1.png`, drawn from the real Stage 1 code. The rubric's Process criterion marks "stage snapshots", and the report's stage-evolution section shows 1 → 2 → 3 side by side.
+8. ➕ **Addition (Takshak, with Robin's help on Customer classes):** commit a Stage 1 class diagram snapshot, `docs/uml/stage-1.png`, drawn from the real Stage 1 code. The rubric's Process criterion marks "stage snapshots", and the report's stage-evolution section shows 1 → 2 → 3 side by side.
 
 ---
 
@@ -127,7 +130,7 @@ Everyone writes **fake versions** of the other people's classes (in their own te
 
 Then: integrate, test, tag `stage-2`, and fresh-clone check as in Week 2.
 
-➕ **Addition (A):** `docs/uml/stage-2.png` snapshot, updated from the Stage 1 diagram. PR descriptions list new and changed files with reasons, so C can copy them into the README.
+➕ **Addition (Takshak):** `docs/uml/stage-2.png` snapshot, updated from the Stage 1 diagram. PR descriptions list new and changed files with reasons, so C can copy them into the README.
 
 ### B and C: start Stage 3 on branches (do not merge before the stage-2 tag)
 - **B:** ComboMeal (units summed, 90% price rounded to the cent, documented combo-choice rule) and Happy Hour (once per game, two turns, 20% off, VIP discount first, price locked at order time, +15 recovery for waiting customers, remaining duration shown).
@@ -151,8 +154,10 @@ New files; changed or deleted files with reasons; compare link (`.../compare/sta
 4. C writes the README section "Stage 2 → 3".
 5. **Diagrams** (draw from the real Stage 3 code, not from memory):
    - ➕ The Stage 3 class diagram doubles as the `stage-3` snapshot.
-   - A: class diagram with visibility, multiplicities, enums, inheritance, and annotations for encapsulation, polymorphism and composition
-   - C: sequence diagram for one full scenario: arrival → seat → order → chef → READY → SERVED → eating → payment → result check, including one VIP or Happy Hour behaviour, with guards and loops
+   - **Takshak (class diagram):** one diagram per stage, with visibility, multiplicities, enums, inheritance, and annotations for encapsulation, polymorphism and composition. Starts from Robin's Stage 2 and 3 drafts in `docs/uml/` and the Stage 1 redraw, and checks every class name against the code at each tag.
+   - **Sibghat (sequence diagram):** one full scenario: arrival → seat → order → chef → READY → SERVED → eating → payment → result check, including one VIP or Happy Hour behaviour, with guards and loops. Caleb confirms the turn order; Robin and Ian answer questions about Customer and Order/Pricing.
+   - **Together:** Takshak and Sibghat cross-check. Every object and message in the sequence diagram must be a class and method that exists in the class diagram, and the class diagram's relationships must match what the sequence diagram calls. Each reviews the other's diagram before it goes into the report.
+   - Use the lecture notation (Chapter 6 class diagram, Chapter 7 sequence diagram): only boundary / control / entity, `<<interface>>` and `<<enumeration>>` stereotypes.
 
 ---
 
@@ -161,6 +166,8 @@ New files; changed or deleted files with reasons; compare link (`.../compare/sta
 ### Report (shared doc, each section has an owner)
 | Section | Owner |
 |---|---|
+| Class diagrams (one per stage) | Takshak, reviewed by Sibghat |
+| Sequence diagram | Sibghat, reviewed by Takshak |
 | Key abstractions and responsibilities table | everyone fills in their own classes |
 | SOLID principles (only where the code really shows them) | B |
 | Trade-offs and one alternative design | A |
@@ -177,7 +184,7 @@ New files; changed or deleted files with reasons; compare link (`.../compare/sta
 | 4 VIP or Critic behaviour | A |
 | 5 Stage 3 feature (combo, Happy Hour, Host) | B, with C on the Host |
 | 6 One victory and one defeat | A |
-| 7 Tag comparisons and diagrams | C (tags), A (diagrams) |
+| 7 Tag comparisons and diagrams | C (tags), Takshak (class diagrams), Sibghat (sequence diagram) |
 
 Put the timestamps in the README.
 
